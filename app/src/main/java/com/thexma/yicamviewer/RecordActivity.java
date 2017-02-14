@@ -23,6 +23,8 @@ public class RecordActivity extends AppCompatActivity {
 
         new RecordLoader(twRecord, eText).execute(url);
 
+        new ParseHTML(twRecord, eText).execute(url);
+
 
     }
 }
