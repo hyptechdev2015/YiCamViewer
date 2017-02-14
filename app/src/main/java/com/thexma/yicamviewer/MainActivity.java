@@ -1,5 +1,6 @@
 package com.thexma.yicamviewer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -68,6 +69,8 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity( intRecord);
             return true;
         }
 
@@ -79,8 +82,12 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
+        if(id == R.id.nav_records)
+        {
+            Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
+            startActivity( intRecord);
+        }
+        else if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
