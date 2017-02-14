@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
 
+
 public class RecordActivity extends AppCompatActivity {
 
     @Override
@@ -21,7 +22,6 @@ public class RecordActivity extends AppCompatActivity {
         String url = settings.getString("hostUrl", "http://192.168.29.168/record/default/");
 
         new RecordLoader(twRecord, eText).execute(url);
-
 
 
     }

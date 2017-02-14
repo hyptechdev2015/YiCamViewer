@@ -18,7 +18,7 @@ import java.net.URL;
  */
 
 
-public class RecordLoader extends AsyncTask< String, Void, String> {
+public class RecordLoader extends AsyncTask<String, Void, String> {
     private TextView textView;
     private EditText editText;
 
@@ -34,7 +34,7 @@ public class RecordLoader extends AsyncTask< String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... strings ) {
+    protected String doInBackground(String... strings) {
         //String weather = "UNDEFINED";
         StringBuilder builder = new StringBuilder();
         try {
@@ -56,10 +56,9 @@ public class RecordLoader extends AsyncTask< String, Void, String> {
             weather = String.valueOf(main.getDouble("temp"));
 */
             urlConnection.disconnect();
-        } catch (IOException  e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
 
         }
         return builder.toString();
