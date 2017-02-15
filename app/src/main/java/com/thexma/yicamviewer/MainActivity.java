@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 
@@ -64,13 +66,12 @@ public class MainActivity extends AppCompatActivity
         //my code
         try {
 
-            SharedPreferences settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), 0);
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             String url = settings.getString("hostUrl", "");
-            String urlPort = settings.getString("hostPort", "333");
-            urlRTSP = "rtsp://" + url + ":" + urlPort + "/ch0_1.h264";
+
 
             if (url.length() > 0)
-                LoadRTSP(urlRTSP);
+                LoadRTSP();
             else {
                 Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intRecord);
@@ -84,10 +85,18 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void LoadRTSP(String url) {
+    private void LoadRTSP() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String url = settings.getString("hostUrl", "none");
+        String urlPort = settings.getString("hostPort", "333");
+        String urlRTSP = "rtsp://" + url + ":" + urlPort + "/ch0_1.h264";
+        //urlRTSP = "rtsp://192.168.29.168:554/ch0_1.h264";
+
+        //SettingsActivity.LoadFromPref();
+        //urlRTSP = "rtsp://" + SettingsActivity.HostUrl + ":" + SettingsActivity.HostPort + "/ch0_1.h264";
 
         TextView etHello = (TextView) findViewById(R.id.textViewHello);
-        etHello.setText(url);
+        etHello.setText(urlRTSP);
 
         //set the media controller buttons
         if (mediaControls == null) {
@@ -101,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         // set a title for the progress bar
         progressDialog.setTitle("RTSP Stream Channels");
         // set a message for the progress bar
-        progressDialog.setMessage(url);
+        progressDialog.setMessage(urlRTSP);
         //set the progress bar not cancelable on users' touch
         progressDialog.setCancelable(false);
         // show the progress bar
@@ -112,23 +121,18 @@ public class MainActivity extends AppCompatActivity
             myVideoView.setMediaController(mediaControls);
 
             //set the uri of the video to be played
-            myVideoView.setVideoURI(Uri.parse(url));
+            myVideoView.setVideoURI(Uri.parse(urlRTSP));
 
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            e.printStackTrace();
-        }
+            myVideoView.requestFocus();
 
-        myVideoView.requestFocus();
+            //we also set an setOnPreparedListener in order to know when the video file is ready for playback
 
-        //we also set an setOnPreparedListener in order to know when the video file is ready for playback
+            myVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-        myVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                // close the progress bar and play the video
-                progressDialog.dismiss();
-                myVideoView.start();
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    // close the progress bar and play the video
+                    progressDialog.dismiss();
+                    myVideoView.start();
                 /*
                 //if we have a position on savedInstanceState, the video playback should start from here
                 myVideoView.seekTo(position);
@@ -138,11 +142,30 @@ public class MainActivity extends AppCompatActivity
                     //if we come from a resumed activity, video playback will be paused
                     myVideoView.pause();
                 }*/
-            }
-        });
+                }
+            });
+
+            myVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    Log.e(" KLE Error", "STOP");
+                    progressDialog.dismiss();
+                    myVideoView.stopPlayback();
+                    //Toast.makeText(getApplicationContext(), "Can't stream video url", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            });
+
+        } catch (Exception e) {
+            progressDialog.dismiss();
+            System.out.println("Video Play Error :"+e.toString());
+            Log.e(" KLE Error", e.getMessage());
+            //e.printStackTrace();
+        }
 
 
     }
+
 
     @Override
     public void onBackPressed() {
@@ -172,6 +195,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intRecord);
+            finish();
             return true;
         }
 
@@ -187,10 +211,9 @@ public class MainActivity extends AppCompatActivity
             Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
             startActivity(intRecord);
         } else if (id == R.id.nav_camera) {
-            this.finish();
-            urlRTSP = "rtsp://hyptech.asuscomm.com:554/ch0_1.h264";
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlRTSP));
             startActivity(intent);
+            //finish();
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -217,7 +240,10 @@ public class MainActivity extends AppCompatActivity
             savedInstanceState.putString("UrlRTSP", urlRTSP);
             //we use onSaveInstanceState in order to store the video playback position for orientation change
             //savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
-            myVideoView.pause();
+/*            if (myVideoView == null)
+                LoadRTSP();
+            else
+                myVideoView.pause();*/
 
         } catch (Exception ex) {
             Log.e("KLEonSave: ", ex.toString());
@@ -228,19 +254,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d("KLE_restore: ", urlRTSP);
+        Log.e("KLE_restore: ", urlRTSP);
 
         try {
             //we use onRestoreInstanceState in order to play the video playback from the stored position
             //position = savedInstanceState.getInt("Position");
             //myVideoView.seekTo(position);
-            myVideoView.start();
+/*            if (myVideoView != null)
+                myVideoView.start();
+            else
+                Log.e("KLE_myVideoView: ", "null");*/
 
-            /*
-            urlRTSP = savedInstanceState.getString("UrlRTSP");
+ /*           urlRTSP = savedInstanceState.getString("UrlRTSP");
             if(urlRTSP.length() > 0)
-                LoadRTSP(urlRTSP);
-*/
+                LoadRTSP(urlRTSP);*/
 
         } catch (Exception ex) {
             Log.e("KLE_onRestore: ", ex.toString());
