@@ -24,8 +24,7 @@ public class SettingsActivity extends AppCompatActivity {
         //PREFS_NAME = getResources().getString(R.string.pref_file);
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        //String urlRemote = "192.168.29.168";
-        String urlRemote = "hyptech.asuscomm.com";
+        String urlRemote = "192.168.29.168";        
         String url = settings.getString("hostUrl", urlRemote);
         tV = (EditText) findViewById(R.id.editTextHostUrl);
         tV.setText(url);
