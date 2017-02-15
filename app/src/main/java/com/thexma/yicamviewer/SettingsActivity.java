@@ -13,6 +13,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public  final static    String PREFS_NAME = "MyPrefsFile";
     private EditText tV;
+    private EditText tvPort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +24,14 @@ public class SettingsActivity extends AppCompatActivity {
         //PREFS_NAME = getResources().getString(R.string.pref_file);
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        String url = settings.getString("hostUrl", "http://192.168.29.168/record/");
+        //String urlRemote = "192.168.29.168";
+        String urlRemote = "hyptech.asuscomm.com";
+        String url = settings.getString("hostUrl", urlRemote);
         tV = (EditText) findViewById(R.id.editTextHostUrl);
         tV.setText(url);
+        String urlPort = settings.getString("hostPort", "554");
+        tvPort = (EditText) findViewById(R.id.editTextPort);
+        tvPort.setText(urlPort);
 
     }
 
@@ -38,6 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("hostUrl", tV.getText().toString());
+        editor.putString("hostPort", tvPort.getText().toString());
 
         // Commit the edits!
         editor.commit();

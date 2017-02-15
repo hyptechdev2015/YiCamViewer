@@ -13,11 +13,47 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Name"
+        android:inputType="textUri|textPersonName"
+        android:text="Host URL"
         android:ems="10"
+        android:id="@+id/editTextHostUrl"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName|number"
+        android:text="Port"
+        android:ems="10"
+        android:id="@+id/editTextPort"
+        android:layout_below="@+id/editTextHostUrl"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="Username"
+        android:ems="10"
+        android:layout_below="@+id/editTextPort"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/editTextHostUrl" />
+        android:id="@+id/editTextUsername" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:layout_below="@+id/editTextUsername"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="21dp"
+        android:id="@+id/editTextPassword"
+        tools:text="Password"
+        android:contentDescription="Password"
+        android:text="Password" />
 </RelativeLayout>

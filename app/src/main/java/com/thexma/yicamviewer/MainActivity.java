@@ -1,10 +1,17 @@
 package com.thexma.yicamviewer;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.TextViewCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,11 +21,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-
+import android.widget.EditText;
+import android.widget.MediaController;
+import android.widget.TextView;
+import android.widget.VideoView;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private VideoView myVideoView;
+    private int position = 0;
+    private ProgressDialog progressDialog;
+    private MediaController mediaControls;
+    private String urlRTSP = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +60,86 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //my code
+        try {
+
+            SharedPreferences settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), 0);
+            String url = settings.getString("hostUrl", "");
+            String urlPort = settings.getString("hostPort", "333");
+            urlRTSP = "rtsp://" + url + ":" + urlPort + "/ch0_1.h264";
+
+            if (url.length() > 0)
+                LoadRTSP(urlRTSP);
+            else {
+                Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intRecord);
+                finish();
+            }
+
+        } catch (Exception ex) {
+            Log.e(" KLE Error: ", ex.toString());
+        }
+
+
+    }
+
+    private void LoadRTSP(String url) {
+
+        TextView etHello = (TextView) findViewById(R.id.textViewHello);
+        etHello.setText(url);
+
+        //set the media controller buttons
+        if (mediaControls == null) {
+            mediaControls = new MediaController(this);
+        }
+        //initialize the VideoView
+        myVideoView = (VideoView) findViewById(R.id.videoViewLive);
+
+        // create a progress bar while the video file is loading
+        progressDialog = new ProgressDialog(this);
+        // set a title for the progress bar
+        progressDialog.setTitle("RTSP Stream Channels");
+        // set a message for the progress bar
+        progressDialog.setMessage(url);
+        //set the progress bar not cancelable on users' touch
+        progressDialog.setCancelable(false);
+        // show the progress bar
+        progressDialog.show();
+
+        try {
+            //set the media controller in the VideoView
+            myVideoView.setMediaController(mediaControls);
+
+            //set the uri of the video to be played
+            myVideoView.setVideoURI(Uri.parse(url));
+
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+
+        myVideoView.requestFocus();
+
+        //we also set an setOnPreparedListener in order to know when the video file is ready for playback
+
+        myVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                // close the progress bar and play the video
+                progressDialog.dismiss();
+                myVideoView.start();
+                /*
+                //if we have a position on savedInstanceState, the video playback should start from here
+                myVideoView.seekTo(position);
+                if (position == 0) {
+                    myVideoView.start();
+                } else {
+                    //if we come from a resumed activity, video playback will be paused
+                    myVideoView.pause();
+                }*/
+            }
+        });
 
 
     }
@@ -75,7 +171,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
-            startActivity( intRecord);
+            startActivity(intRecord);
             return true;
         }
 
@@ -87,13 +183,14 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if(id == R.id.nav_records)
-        {
+        if (id == R.id.nav_records) {
             Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
-            startActivity( intRecord);
-        }
-        else if (id == R.id.nav_camera) {
-            // Handle the camera action
+            startActivity(intRecord);
+        } else if (id == R.id.nav_camera) {
+            this.finish();
+            urlRTSP = "rtsp://hyptech.asuscomm.com:554/ch0_1.h264";
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlRTSP));
+            startActivity(intent);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -109,5 +206,44 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+
+        try {
+            savedInstanceState.putString("UrlRTSP", urlRTSP);
+            //we use onSaveInstanceState in order to store the video playback position for orientation change
+            //savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
+            myVideoView.pause();
+
+        } catch (Exception ex) {
+            Log.e("KLEonSave: ", ex.toString());
+        }
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d("KLE_restore: ", urlRTSP);
+
+        try {
+            //we use onRestoreInstanceState in order to play the video playback from the stored position
+            //position = savedInstanceState.getInt("Position");
+            //myVideoView.seekTo(position);
+            myVideoView.start();
+
+            /*
+            urlRTSP = savedInstanceState.getString("UrlRTSP");
+            if(urlRTSP.length() > 0)
+                LoadRTSP(urlRTSP);
+*/
+
+        } catch (Exception ex) {
+            Log.e("KLE_onRestore: ", ex.toString());
+        }
     }
 }

@@ -19,7 +19,9 @@ public class RecordActivity extends AppCompatActivity {
         TextView twRecord = (TextView) findViewById(R.id.textViewRecord);
 
         SharedPreferences settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString() , 0);
-        String url = settings.getString("hostUrl", "http://192.168.29.168/record/default/");
+        //"http://192.168.29.168/record/"
+        String url = "http://"  + settings.getString("hostUrl", "") + "/record/";
+        String urlPort = settings.getString("hostPort","333");
 
         new RecordLoader(twRecord, eText).execute(url);
 
