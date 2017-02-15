@@ -187,8 +187,7 @@ public class MainActivity extends AppCompatActivity
             Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
             startActivity(intRecord);
         } else if (id == R.id.nav_camera) {
-            this.finish();
-            urlRTSP = "rtsp://hyptech.asuscomm.com:554/ch0_1.h264";
+            this.finish();            
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlRTSP));
             startActivity(intent);
         } else if (id == R.id.nav_gallery) {
