@@ -13,23 +13,40 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import dll.Record;
 
 public class ParseHTML extends AsyncTask<String, Void, Void> {
 
     private TextView textView;
     private EditText editText;
     private String baseURL;
+    private SimpleDateFormat sdf  = new SimpleDateFormat("yyyyMMdd", Locale.US);
+    private GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("US/Central"));
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMMyyyy HH:mm");
+    private SimpleDateFormat databaseDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-    public ParseHTML(TextView textView, EditText editText) {
+    private ArrayList<Record> recordList = new ArrayList<Record>();
+
+    public  ParseHTML(){}
+
+/*    public ParseHTML(TextView textView, EditText editText) {
         this.textView = textView;
         this.editText = editText;
-    }
+        sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
+    }*/
 
     @Override
     protected Void doInBackground(String... params) {
         baseURL = params[0];
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMMyyyy HH:mm");
+
+
 
         try {
             Document doc = Jsoup.connect(baseURL).get();
@@ -58,10 +75,25 @@ public class ParseHTML extends AsyncTask<String, Void, Void> {
                     String[] lists = docSub.outerHtml().split("\n");
                     for (String list : lists) {
                         if (list.length() == 105 && list.indexOf("mp4") > 0) {
-                            mp4Name = list.substring(75, 90);
+                            String mp4FileName = list.substring(9, 19);
+                            String mp4NameDateTime = list.substring(75, 90);
+                            String fileSize = list.substring(75,list.length()).split("     ")[1].trim();
                             try {
-                                mp4DateTime = simpleDateFormat.parse(mp4Name);
+
+                                mp4DateTime = simpleDateFormat.parse(mp4NameDateTime);
+                                //recordList.add(new Record());
+                                String fullUrl = folder + "/" + mp4FileName;
+
+                                //Calendar calendar = Calendar.getInstance();
+                                //calendar.setTime(mp4DateTime);
+                                //cal = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                                int dateInt = Integer.parseInt(sdf.format(mp4DateTime.getTime()));// cal.getTime()));
+
+                                Record rec = new Record(0,folder,mp4FileName,databaseDateFormat.format(mp4DateTime).toString(), fileSize,fullUrl,dateInt );
+                                MainActivity.datasource.insertRecord(rec);
+
                             } catch (ParseException ex) {
+                                Log.e(" ParseHTML: ", ex.toString());
                                 System.out.println("Exception " + ex);
                             }
                         }
@@ -72,6 +104,7 @@ public class ParseHTML extends AsyncTask<String, Void, Void> {
 
             String st = "";
         } catch (IOException e) {
+            Log.e( " kekekekL", e.toString());
             e.printStackTrace();
         }
 

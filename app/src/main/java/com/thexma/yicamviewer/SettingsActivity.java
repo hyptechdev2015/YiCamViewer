@@ -15,9 +15,11 @@ import android.widget.TextView;
 public class SettingsActivity extends AppCompatActivity {
 
 
-    public  final static    String PREFS_NAME = "MyPrefsFile";
+    public final static String PREFS_NAME = "MyYiCamPrefsFile";
     public static String HostUrl;
     public static String HostPort;
+
+    private SharedPreferences settings;
 
     private static EditText tV;
     private static EditText tvPort;
@@ -25,9 +27,9 @@ public class SettingsActivity extends AppCompatActivity {
     //shared pref methods from non activity classes.
     //because getSharedPreferences required the context.
     //but in activity class we can call without this context
-    private static Context 	mContext;
+    private static Context mContext;
 
-    public static void Init(Context context)
+/*    public static void Init(Context context)
     {
         mContext 		= context;
     }
@@ -52,7 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //final step to commit (save)the changes in to the shared pref
         editor.commit();
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +64,12 @@ public class SettingsActivity extends AppCompatActivity {
         // Restore preferences
         //PREFS_NAME = getResources().getString(R.string.pref_file);
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String urlRemote = "192.168.29.168";        
-        String url = settings.getString("hostUrl", urlRemote);
+        settings = getSharedPreferences(this.PREFS_NAME.toString() , MODE_PRIVATE);
+        String urlRemote = "192.168.29.168";
+        String url = settings.getString("HostUrl", urlRemote);
         tV = (EditText) findViewById(R.id.editTextHostUrl);
         tV.setText(url);
-        String urlPort = settings.getString("hostPort", "554");
+        String urlPort = settings.getString("HostPort", "554");
         tvPort = (EditText) findViewById(R.id.editTextPort);
         tvPort.setText(urlPort);
 
@@ -80,10 +82,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         // We need an Editor object to make preference changes.
         // All objects are from android.context.Context
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        settings = getSharedPreferences(this.PREFS_NAME.toString(), MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("hostUrl", tV.getText().toString());
-        editor.putString("hostPort", tvPort.getText().toString());
+        editor.putString("HostUrl", tV.getText().toString());
+        editor.putString("HostPort", tvPort.getText().toString());
 
         // Commit the edits!
         editor.commit();

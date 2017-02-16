@@ -43,6 +43,9 @@ public class MainActivity extends AppCompatActivity
 
     public static DatabaseInterface datasource;
     public static SharedPreferences settings;
+    public static String HTTP_URL ;
+    public static String RSTP_URL;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,18 +75,19 @@ public class MainActivity extends AppCompatActivity
         //my code
         try {
 
-            settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            //settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), MODE_PRIVATE);
             //datasoure
             datasource = new DatabaseInterface(this);
             datasource.open();
-            if(!settings.getBoolean("firstTime", false)){
+            if (!settings.getBoolean("firstTime", false)) {
                 datasource.simulateExternalDatabase();
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putBoolean("firstTime", true);
                 editor.commit();
             }
 
-            String url = settings.getString("hostUrl", "");
+            String url = settings.getString("HostUrl", "");
             if (url.length() > 0)
                 LoadRTSP();
             else {
@@ -100,10 +104,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void LoadRTSP() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String url = settings.getString("hostUrl", "none");
-        String urlPort = settings.getString("hostPort", "333");
+        settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), MODE_PRIVATE);
+        String url = settings.getString("HostUrl", "none");
+        String urlPort = settings.getString("HostPort", "333");
         String urlRTSP = "rtsp://" + url + ":" + urlPort + "/ch0_1.h264";
+
+        HTTP_URL = "http://" + url + "/record/";
+        RSTP_URL = urlRTSP;
+
         //urlRTSP = "rtsp://192.168.29.168:554/ch0_1.h264";
 
         //SettingsActivity.LoadFromPref();
@@ -173,7 +181,7 @@ public class MainActivity extends AppCompatActivity
 
         } catch (Exception e) {
             progressDialog.dismiss();
-            System.out.println("Video Play Error :"+e.toString());
+            System.out.println("Video Play Error :" + e.toString());
             Log.e(" KLE Error", e.getMessage());
             //e.printStackTrace();
         }
@@ -223,6 +231,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_records) {
+            if (myVideoView != null)
+                myVideoView.pause();
             Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
             startActivity(intRecord);
 /*            FragmentManager fragmentManager = getFragmentManager();

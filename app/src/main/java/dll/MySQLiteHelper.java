@@ -25,7 +25,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     //table creation statements
     private static final String RECORDS_CREATE = "create table " + TABLE_RECORDS + "( " +
-            RECORDS_ID + " integer primary key, " + RECORDS_FOLDERNAME + " text not null, "
+            RECORDS_ID + " integer primary key AUTOINCREMENT, " + RECORDS_FOLDERNAME + " text not null, "
             + RECORDS_FILENAME + " text not null, " + RECORDS_FILEDATE + " DATETIME not null, " +
             RECORDS_FILESIZE + " text not null, " + RECORDS_FULLURL + " text not null, " +  RECORDS_DATE + " integer not null);";
 

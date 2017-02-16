@@ -16,7 +16,7 @@ public class DatabaseInterface {
     private SQLiteDatabase database;
     private MySQLiteHelper dbhelper;
 
-    public DatabaseInterface(Context context){
+    public DatabaseInterface(Context context) {
         dbhelper = new MySQLiteHelper(context);
     }
 
@@ -28,11 +28,11 @@ public class DatabaseInterface {
         dbhelper.close();
     }
 
-    public ArrayList<Record> getRecordList(){
+    public ArrayList<Record> getRecordList() {
         ArrayList<Record> res = new ArrayList<Record>();
         Cursor cursor = database.query("records", null, null, null, null, null, "id");
         cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             Record t = cursorToRecord(cursor);
             res.add(t);
             cursor.moveToNext();
@@ -40,12 +40,13 @@ public class DatabaseInterface {
         cursor.close();
         return res;
     }
-    public ArrayList<Record> getRecord(int date){
+
+    public ArrayList<Record> getRecord(int date) {
         ArrayList<Record> res = new ArrayList<Record>();
 
         Cursor cursor = database.query("records", null, "date = " + date, null, null, null, "id");
         cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
+        while (!cursor.isAfterLast()) {
             Record e = cursorToRecord(cursor);
             res.add(e);
             cursor.moveToNext();
@@ -54,15 +55,43 @@ public class DatabaseInterface {
         return res;
     }
 
-    private Record cursorToRecord(Cursor c){
+    private Record cursorToRecord(Cursor c) {
         Record t = new Record(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), c.getInt(6));
         return t;
     }
 
-    public void simulateExternalDatabase(){
+    public Record getLastestRecord(){
+        Record rec = new Record();
+        String selectQuery = "SELECT * FROM records ORDER BY column DESC LIMIT 1;";
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            rec = cursorToRecord(cursor);
+        }
+        cursor.close();
+        return rec;
+
+    }
+
+    public void insertRecord(Record rec){
         ContentValues values = new ContentValues();
         //Populate Teacher tables
-        values.put("id", 0);
+        //values.put("id", 0);
+        values.put("foldername", rec.getFolderName() );
+        values.put("filename", rec.getFileName());
+        values.put("filedate", rec.getFileDate());
+        values.put("filesize", rec.getFileSize());
+        values.put("fullurl", rec.getFullUrl());
+        values.put("date", rec.getDate() );
+        database.insert("records", null, values);
+        values.clear();
+
+    }
+
+    public void simulateExternalDatabase() {
+        ContentValues values = new ContentValues();
+        //Populate Teacher tables
+        //values.put("id", 0);
         values.put("foldername", "2017Y02M15D16H");
         values.put("filename", "20M00S.mp4");
         values.put("filedate", "15Feb2017 16:21");
@@ -71,7 +100,7 @@ public class DatabaseInterface {
         values.put("date", 20170215);
         database.insert("records", null, values);
         values.clear();
-        values.put("id", 1);
+        //values.put("id", 1);
         values.put("foldername", "2017Y02M13D18H");
         values.put("filename", "01M00S.mp4");
         values.put("filedate", "13Feb2017 18:02");

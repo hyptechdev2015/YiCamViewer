@@ -42,7 +42,7 @@ public class RecordListAdapter extends ArrayAdapter<Record> {
         TextView description = (TextView)row.findViewById(R.id.notificationDescription);
 
         Record e = data.get(position);
-        title.setText(e.getFileName());
+        title.setText(e.getFileName() + " | "+ e.getFileDate() + " | " + e.getFolderName());
         description.setText(e.getFullUrl());
 
         return row;

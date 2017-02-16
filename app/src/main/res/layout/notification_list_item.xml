@@ -14,26 +14,27 @@
     </LinearLayout>
 
     <TextView
+        android:textColor="@color/colorPrimaryDark"
         android:id="@+id/notificationTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/notificationDescription"
         android:layout_alignParentTop="true"
         android:layout_marginTop="14dp"
-        android:textStyle="bold"
         android:text="Title"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <TextView
+        android:textColor="@color/colorPrimaryDark"
         android:id="@+id/notificationDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/linearLayout1"
         android:layout_marginLeft="18dp"
         android:layout_marginTop="14dp"
         android:text="Description"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
     <LinearLayout
         android:id="@+id/LinearLayout02"

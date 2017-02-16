@@ -4,8 +4,11 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -35,7 +39,9 @@ public class RecordActivity extends AppCompatActivity {
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
     public GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("US/Central"));
     public ArrayList<Record> eventList = new ArrayList<Record>();
-
+    private SharedPreferences settings;
+    private ListView listview;
+    private ListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +49,13 @@ public class RecordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_record);
 
 
-        SharedPreferences settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), 0);
+        settings = getSharedPreferences(SettingsActivity.PREFS_NAME, MODE_PRIVATE);
         //"http://192.168.29.168/record/"
-        String url = "http://" + settings.getString("hostUrl", "") + "/record/";
-        String urlPort = settings.getString("hostPort", "333");
+        String url = "http://" + settings.getString("HostUrl", "") + "/record/";
+        String urlPort = settings.getString("HostPort", "333");
 
-        //new RecordLoader(twRecord, eText).execute(url);
-        //new ParseHTML(twRecord, eText).execute(url);
+        //new RecordLoader(null, null).execute(url);
+        //new ParseHTML().execute(url);
 
 /*        eText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,8 +76,8 @@ public class RecordActivity extends AppCompatActivity {
 
         cal.setTimeInMillis(c.getDate());
         eventList = MainActivity.datasource.getRecord(Integer.parseInt(sdf.format(cal.getTime())));
-        ListAdapter adapter = new RecordListAdapter(getApplicationContext(), R.layout.notification_list_item, eventList);
-        ListView listview = (ListView) findViewById(R.id.eventListRecord);
+        adapter = new RecordListAdapter(getApplicationContext(), R.layout.notification_list_item, eventList);
+        listview = (ListView) findViewById(R.id.eventListRecord);
         listview.setAdapter(adapter);
 
         c.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -83,9 +89,13 @@ public class RecordActivity extends AppCompatActivity {
                     int date = Integer.parseInt(sdf.format(cal.getTime()));
 
                     eventList = MainActivity.datasource.getRecord(date);
-                    ListAdapter adapter = new RecordListAdapter(getApplicationContext(), R.layout.notification_list_item, eventList);
-                    ListView listview = (ListView) findViewById(R.id.eventListRecord);
+                    adapter = new RecordListAdapter(getApplicationContext(), R.layout.notification_list_item, eventList);
+                    listview = (ListView) findViewById(R.id.eventListRecord);
                     listview.setAdapter(adapter);
+
+
+
+
 
                     String str = "day: " + dayOfMonth + " month: " + month + " year: " + year + " Integer: " + Integer.parseInt(sdf.format(cal.getTime()));
                     Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
@@ -96,6 +106,33 @@ public class RecordActivity extends AppCompatActivity {
             }
         });
 
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Record recSelected = (Record) adapter.getItem(position);
+                Log.d("**********", recSelected.toString());
+                //Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                String urlRTSP = MainActivity.HTTP_URL + recSelected.getFullUrl();
+                Log.d("**********", urlRTSP.toString());
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlRTSP));
+                startActivity(intent);
+
+            }
+        });
+
+
+/*        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View v, int position,
+                                    long arg3) {
+                String value = (String) adapter.getItemAtPosition(position);
+                // assuming string and if you want to get the value on click of list item
+                // do what you intend to do on click of listview row
+
+            }
+        });*/
 
     }
 
