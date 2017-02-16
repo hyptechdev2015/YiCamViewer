@@ -1,6 +1,8 @@
 package com.thexma.yicamviewer;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import dll.*;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -37,6 +40,9 @@ public class MainActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
     private String urlRTSP = "";
+
+    public static DatabaseInterface datasource;
+    public static SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +72,18 @@ public class MainActivity extends AppCompatActivity
         //my code
         try {
 
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            //datasoure
+            datasource = new DatabaseInterface(this);
+            datasource.open();
+            if(!settings.getBoolean("firstTime", false)){
+                datasource.simulateExternalDatabase();
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("firstTime", true);
+                editor.commit();
+            }
+
             String url = settings.getString("hostUrl", "");
-
-
             if (url.length() > 0)
                 LoadRTSP();
             else {
@@ -156,6 +170,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
+
         } catch (Exception e) {
             progressDialog.dismiss();
             System.out.println("Video Play Error :"+e.toString());
@@ -208,8 +223,15 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_records) {
-            Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
-            startActivity(intRecord);
+/*            Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
+            startActivity(intRecord);*/
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            //CalendarFragment frag = new CalendarFragment();
+            fragmentTransaction.add(R.id.activity_record, CalendarFragment.newInstance(this.getApplicationContext()) , "Reocords ");
+            fragmentTransaction.commit();
+
+
         } else if (id == R.id.nav_camera) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlRTSP));
             startActivity(intent);
@@ -273,4 +295,17 @@ public class MainActivity extends AppCompatActivity
             Log.e("KLE_onRestore: ", ex.toString());
         }
     }
+
+    @Override
+    protected void onResume() {
+        datasource.open();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        datasource.close();
+        super.onPause();
+    }
+
 }
