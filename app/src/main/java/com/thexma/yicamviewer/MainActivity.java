@@ -223,16 +223,18 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.nav_records) {
-/*            Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
-            startActivity(intRecord);*/
-            FragmentManager fragmentManager = getFragmentManager();
+            Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
+            startActivity(intRecord);
+/*            FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             //CalendarFragment frag = new CalendarFragment();
             fragmentTransaction.add(R.id.activity_record, CalendarFragment.newInstance(this.getApplicationContext()) , "Reocords ");
-            fragmentTransaction.commit();
+            fragmentTransaction.commit();*/
 
 
         } else if (id == R.id.nav_camera) {
+            if (myVideoView != null)
+                myVideoView.pause();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlRTSP));
             startActivity(intent);
             //finish();
@@ -295,7 +297,7 @@ public class MainActivity extends AppCompatActivity
             Log.e("KLE_onRestore: ", ex.toString());
         }
     }
-
+/*
     @Override
     protected void onResume() {
         datasource.open();
@@ -307,5 +309,5 @@ public class MainActivity extends AppCompatActivity
         datasource.close();
         super.onPause();
     }
-
+*/
 }

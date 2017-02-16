@@ -43,7 +43,7 @@ public class DatabaseInterface {
     public ArrayList<Record> getRecord(int date){
         ArrayList<Record> res = new ArrayList<Record>();
 
-        Cursor cursor = database.query("events", null, "date = " + date, null, null, null, "id");
+        Cursor cursor = database.query("records", null, "date = " + date, null, null, null, "id");
         cursor.moveToFirst();
         while(!cursor.isAfterLast()){
             Record e = cursorToRecord(cursor);
@@ -68,7 +68,7 @@ public class DatabaseInterface {
         values.put("filedate", "15Feb2017 16:21");
         values.put("filesize", "2155868");
         values.put("fullurl", "/record/2017Y02M15D16H/20M00S.mp4");
-        values.put("date", 20171502);
+        values.put("date", 20170215);
         database.insert("records", null, values);
         values.clear();
         values.put("id", 1);
@@ -77,7 +77,7 @@ public class DatabaseInterface {
         values.put("filedate", "13Feb2017 18:02");
         values.put("filesize", "850861");
         values.put("fullurl", "/record/2017Y02M13D18H/01M00S.mp4");
-        values.put("date", 20171402);
+        values.put("date", 20170214);
         database.insert("records", null, values);
         values.clear();
 

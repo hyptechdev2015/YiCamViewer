@@ -27,22 +27,14 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import dll.*;
 
 public class RecordActivity extends AppCompatActivity {
-    private EditText eText;
-    static TextView twRecord;
-    private Context mContext;
 
-    //public ArrayList<Event> eventList = new ArrayList<Event>();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-    GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("US/Central"));
-
+    public SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
+    public GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("US/Central"));
     public ArrayList<Record> eventList = new ArrayList<Record>();
-
-    public RecordActivity(Context context) {
-        this.mContext = context;
-    }
 
 
     @Override
@@ -50,8 +42,6 @@ public class RecordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
 
-        eText = (EditText) findViewById(R.id.editTextRecord);
-        twRecord = (TextView) findViewById(R.id.textViewRecord);
 
         SharedPreferences settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), 0);
         //"http://192.168.29.168/record/"
@@ -69,30 +59,42 @@ public class RecordActivity extends AppCompatActivity {
             }
         });*/
 
-        //CalendarView
+        //CalendarView load today
+        Calendar calendarMin = Calendar.getInstance();
+        Calendar calendarMax = Calendar.getInstance();
+        calendarMin.add(Calendar.MONTH, -3); // * - subtract one day, i.e. March 7
+        calendarMax.add(Calendar.DAY_OF_MONTH, 1);
         final CalendarView c = (CalendarView) findViewById(R.id.calendarViewRecord);
-        cal.setTimeInMillis(c.getDate());
-        //eventList = MainActivity.datasource.getEvent(Integer.parseInt(sdf.format(cal.getTime())));
+        c.setMinDate(calendarMin.getTimeInMillis());
+        c.setMaxDate(calendarMax.getTimeInMillis());
 
-        //istAdapter adapter = new EventListAdapter(getActivity(), R.layout.notification_list_item, eventList);
-        //ListView listview = (ListView)findViewById(R.id.eventListRecord);
-        //listview.setAdapter(adapter);
+        cal.setTimeInMillis(c.getDate());
+        eventList = MainActivity.datasource.getRecord(Integer.parseInt(sdf.format(cal.getTime())));
+        ListAdapter adapter = new RecordListAdapter(getApplicationContext(), R.layout.notification_list_item, eventList);
+        ListView listview = (ListView) findViewById(R.id.eventListRecord);
+        listview.setAdapter(adapter);
 
         c.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
             @Override
-            public void onSelectedDayChange(CalendarView view, int year, int month,int dayOfMonth) {
-                cal.setTimeInMillis(c.getDate());
-                eventList = MainActivity.datasource.getRecord(Integer.parseInt(sdf.format(cal.getTime())));
-                ListAdapter adapter = new RecordListAdapter(   mContext  , R.layout.notification_list_item, eventList);
-                ListView listview = (ListView)findViewById(R.id.eventListRecord);
-                listview.setAdapter(adapter);
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+                try {
+                    cal = new GregorianCalendar(year, month, dayOfMonth);
+                    int date = Integer.parseInt(sdf.format(cal.getTime()));
 
-                String str = "day: " + dayOfMonth + " month: " + month + " year: " + year;
-                Toast.makeText(getApplicationContext(), str , Toast.LENGTH_SHORT).show();
+                    eventList = MainActivity.datasource.getRecord(date);
+                    ListAdapter adapter = new RecordListAdapter(getApplicationContext(), R.layout.notification_list_item, eventList);
+                    ListView listview = (ListView) findViewById(R.id.eventListRecord);
+                    listview.setAdapter(adapter);
+
+                    String str = "day: " + dayOfMonth + " month: " + month + " year: " + year + " Integer: " + Integer.parseInt(sdf.format(cal.getTime()));
+                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+                } catch (Exception ex) {
+                    Log.e(" here: ", ex.toString());
+                }
+
             }
         });
-
 
 
     }
@@ -110,7 +112,7 @@ public class RecordActivity extends AppCompatActivity {
                 days = "0" + day;
 
             }
-            twRecord.setText(days + "/" + months + "/" + years);
+            //twRecord.setText(days + "/" + months + "/" + years);
 
 
         }

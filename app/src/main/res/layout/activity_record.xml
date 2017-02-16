@@ -10,26 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.thexma.yicamviewer.RecordActivity">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="Record Activity"
-        android:ems="10"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/editTextRecord" />
-
-    <TextView
-        android:text="TextView"
-        android:layout_width="match_parent"
-        android:layout_below="@+id/editTextRecord"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/textViewRecord"
-        android:layout_height="50dp" />
-
     <TextView
         android:id="@+id/eventText"
         android:layout_width="wrap_content"
@@ -52,9 +32,9 @@
     <CalendarView
         android:id="@+id/calendarViewRecord"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
         android:layout_below="@+id/textViewRecord"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_height="150dp" />
 
 </RelativeLayout>
