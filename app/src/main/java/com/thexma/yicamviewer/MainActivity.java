@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -39,7 +41,8 @@ public class MainActivity extends AppCompatActivity
     private int position = 0;
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
-    private String urlRTSP = "";
+
+
 
     public static DatabaseInterface datasource;
     public static SharedPreferences settings;
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity
 
     private String reachable = "0";
 
-    String finalS = "";
+    private String finalS = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
 
         //my code
         try {
@@ -107,12 +111,18 @@ public class MainActivity extends AppCompatActivity
                 Log.e("-------------", e.getMessage());
             }
 
-            if (reachable == "1") {
-                //LoadHTML();
-                //LoadRTSP();
-                testWebService();
+            if (host.length() > 0) {
+                TextView etHello = (TextView) findViewById(R.id.textViewHello);
 
-                String tes1 = "";
+                Log.d("---------------host1", host.toString());
+
+                //LoadHTML();
+                LoadRTSP();
+                //testWebService();
+                Log.d("---------------host2", host.toString());
+
+                etHello.setText(finalS);
+                Log.d("---------------2", finalS.toString());
 
             } else {
                 Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
@@ -136,6 +146,7 @@ public class MainActivity extends AppCompatActivity
 
                 String s1 = "";
                 finalS = responseData.toString();
+                Log.d("----------1", finalS.toString());
                 String s2 = "";
             }
 
@@ -169,10 +180,6 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        TextView etHello = (TextView) findViewById(R.id.textViewHello);
-        etHello.setText(RSTP_URL);
-
-
         //set the media controller buttons
         if (mediaControls == null) {
             mediaControls = new MediaController(this);
@@ -185,7 +192,7 @@ public class MainActivity extends AppCompatActivity
         // set a title for the progress bar
         progressDialog.setTitle("RTSP Stream Channels");
         // set a message for the progress bar
-        progressDialog.setMessage(urlRTSP);
+        progressDialog.setMessage(RSTP_URL);
         //set the progress bar not cancelable on users' touch
         progressDialog.setCancelable(false);
         // show the progress bar
@@ -196,7 +203,7 @@ public class MainActivity extends AppCompatActivity
             myVideoView.setMediaController(mediaControls);
 
             //set the uri of the video to be played
-            myVideoView.setVideoURI(Uri.parse(urlRTSP));
+            myVideoView.setVideoURI(Uri.parse(RSTP_URL));
 
             myVideoView.requestFocus();
 
@@ -284,11 +291,14 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Fragment fragment = null;
+
         if (id == R.id.nav_records) {
             if (myVideoView != null)
                 myVideoView.pause();
             Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
             startActivity(intRecord);
+
 /*            FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             //CalendarFragment frag = new CalendarFragment();
@@ -299,14 +309,15 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_camera) {
             if (myVideoView != null)
                 myVideoView.pause();
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlRTSP));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(RSTP_URL));
             startActivity(intent);
+
             //finish();
         } else if (id == R.id.nav_gallery) {
+            fragment = new EmptyFragment();
+            showFragment(fragment);
 
         } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
@@ -314,9 +325,23 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+
+    }
+
+    private void showFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
     }
 
     @Override

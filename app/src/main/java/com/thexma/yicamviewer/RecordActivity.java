@@ -94,9 +94,6 @@ public class RecordActivity extends AppCompatActivity {
                     listview.setAdapter(adapter);
 
 
-
-
-
                     String str = "day: " + dayOfMonth + " month: " + month + " year: " + year + " Integer: " + Integer.parseInt(sdf.format(cal.getTime()));
                     Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {
