@@ -2,7 +2,9 @@ package com.thexma.yicamviewer;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -22,7 +24,7 @@ import java.util.TimeZone;
 
 import dll.Record;
 
-public class ParseHTML extends AsyncTask<String, Void, Void> {
+public class ParseHTML extends AsyncTask <String, Integer, String> {
 
     private TextView textView;
     private EditText editText;
@@ -34,7 +36,13 @@ public class ParseHTML extends AsyncTask<String, Void, Void> {
 
     private ArrayList<Record> recordList = new ArrayList<Record>();
 
-    public  ParseHTML(){}
+    private ProgressBar progressBar;
+    private         int count ;
+    private int countMax = 100;
+
+    public  ParseHTML( ProgressBar pro){
+        this.progressBar = pro;
+    }
 
 /*    public ParseHTML(TextView textView, EditText editText) {
         this.textView = textView;
@@ -43,19 +51,49 @@ public class ParseHTML extends AsyncTask<String, Void, Void> {
     }*/
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+        progressBar.setVisibility(View.INVISIBLE);
+        progressBar.setProgress(0);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        //count =1;
+        progressBar.setVisibility(View.VISIBLE);
+        //progressBar.setProgress(0);
+
+        Log.wtf("----------","Task Starting...");
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        Log.d("------------", "Progress Update: " + values[0].toString());
+
+        super.onProgressUpdate(values[0]);
+        progressBar.setProgress(values[0]);
+    }
+
+    @Override
+    protected String  doInBackground(String... params) {
         baseURL = params[0];
-
-
-
         try {
             Document doc = Jsoup.connect(baseURL).get();
             Elements folders = doc.select("PRE > a");
             String fullPath = "";
             String folder = "";
             String folderText = "";
+            count = 0;
+            countMax = folders.size();
             for (Element item : folders) {
-                Log.d(" debug", "elements are: " + item);
+                count += 1;
+
+                float percentage = ((float)count / (float)countMax) * 100;
+
+                publishProgress( new Float( percentage).intValue());
+
+                Log.d("-----------------", "elements are: " + item);
                 folder = item.attr("href");
                 folderText = item.text();
                 if (folder.length() > 3) {
@@ -93,7 +131,7 @@ public class ParseHTML extends AsyncTask<String, Void, Void> {
                                 MainActivity.datasource.insertRecord(rec);
 
                             } catch (ParseException ex) {
-                                Log.e(" ParseHTML: ", ex.toString());
+                                Log.e("-----------------: ", ex.toString());
                                 System.out.println("Exception " + ex);
                             }
                         }
@@ -108,7 +146,7 @@ public class ParseHTML extends AsyncTask<String, Void, Void> {
             e.printStackTrace();
         }
 
-        return null;
+        return "Task Completed.";
     }
 
 }

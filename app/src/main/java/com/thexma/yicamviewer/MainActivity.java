@@ -1,19 +1,13 @@
 package com.thexma.yicamviewer;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.TextViewCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -24,11 +18,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import dll.*;
 
@@ -43,9 +43,18 @@ public class MainActivity extends AppCompatActivity
 
     public static DatabaseInterface datasource;
     public static SharedPreferences settings;
-    public static String HTTP_URL ;
+    public static String HTTP_URL;
     public static String RSTP_URL;
 
+    private ProgressBar progressBar;
+    private int count = 1;
+
+    //task
+    private ParseHTML htmlTask;
+
+    private String reachable = "0";
+
+    String finalS = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,38 +96,82 @@ public class MainActivity extends AppCompatActivity
                 editor.commit();
             }
 
-            String url = settings.getString("HostUrl", "");
-            if (url.length() > 0)
-                LoadRTSP();
-            else {
+            String host = settings.getString("HostUrl", "none");
+            String urlPort = settings.getString("HostPort", "333");
+            RSTP_URL = "rtsp://" + host + ":" + urlPort + "/ch0_1.h264";
+            HTTP_URL = "http://" + host + "/record/";
+
+            try {
+                reachable = new URLCheckTask(getApplicationContext()).execute(HTTP_URL).get();
+            } catch (Exception e) {
+                Log.e("-------------", e.getMessage());
+            }
+
+            if (reachable == "1") {
+                //LoadHTML();
+                //LoadRTSP();
+                testWebService();
+
+                String tes1 = "";
+
+            } else {
                 Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intRecord);
                 finish();
             }
 
+
         } catch (Exception ex) {
-            Log.e(" KLE Error: ", ex.toString());
+            Log.e(" ---------: ", ex.toString());
         }
 
 
     }
 
+    private void testWebService() {
+
+        WebService s = new WebService(getApplicationContext(), HTTP_URL, new WebService.OnTaskDoneListener() {
+            @Override
+            public void onTaskDone(String responseData) {
+
+                String s1 = "";
+                finalS = responseData.toString();
+                String s2 = "";
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+        s.execute();
+
+    }
+
+    private void LoadHTML() {
+        //progress bar
+        progressBar = (ProgressBar) findViewById(R.id.progressBarTask);
+        progressBar.setMax(100);
+
+        //progressBar.setVisibility(View.VISIBLE);
+        //progressBar.setProgress(0);
+
+        //load data to datasource
+        htmlTask = new ParseHTML(progressBar);
+        htmlTask.execute(HTTP_URL);
+    }
+
     private void LoadRTSP() {
-        settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), MODE_PRIVATE);
-        String url = settings.getString("HostUrl", "none");
-        String urlPort = settings.getString("HostPort", "333");
-        String urlRTSP = "rtsp://" + url + ":" + urlPort + "/ch0_1.h264";
 
-        HTTP_URL = "http://" + url + "/record/";
-        RSTP_URL = urlRTSP;
+        if (reachable == "0") {
+            Toast.makeText(getApplicationContext(), "URL Not Reachable", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        //urlRTSP = "rtsp://192.168.29.168:554/ch0_1.h264";
-
-        //SettingsActivity.LoadFromPref();
-        //urlRTSP = "rtsp://" + SettingsActivity.HostUrl + ":" + SettingsActivity.HostPort + "/ch0_1.h264";
 
         TextView etHello = (TextView) findViewById(R.id.textViewHello);
-        etHello.setText(urlRTSP);
+        etHello.setText(RSTP_URL);
+
 
         //set the media controller buttons
         if (mediaControls == null) {
@@ -170,7 +223,7 @@ public class MainActivity extends AppCompatActivity
             myVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
-                    Log.e(" KLE Error", "STOP");
+                    Log.e(" ---------------", "STOP");
                     progressDialog.dismiss();
                     myVideoView.stopPlayback();
                     //Toast.makeText(getApplicationContext(), "Can't stream video url", Toast.LENGTH_LONG).show();
@@ -181,8 +234,9 @@ public class MainActivity extends AppCompatActivity
 
         } catch (Exception e) {
             progressDialog.dismiss();
+            myVideoView.stopPlayback();
             System.out.println("Video Play Error :" + e.toString());
-            Log.e(" KLE Error", e.getMessage());
+            Log.e(" ------------", e.getMessage().toString());
             //e.printStackTrace();
         }
 
@@ -271,7 +325,9 @@ public class MainActivity extends AppCompatActivity
 
 
         try {
-            savedInstanceState.putString("UrlRTSP", urlRTSP);
+            if (htmlTask != null)
+                htmlTask.cancel(true);
+            savedInstanceState.putString("HTTP_URL", HTTP_URL);
             //we use onSaveInstanceState in order to store the video playback position for orientation change
             //savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
 /*            if (myVideoView == null)
@@ -280,7 +336,7 @@ public class MainActivity extends AppCompatActivity
                 myVideoView.pause();*/
 
         } catch (Exception ex) {
-            Log.e("KLEonSave: ", ex.toString());
+            Log.e("--------: ", ex.toString());
         }
 
     }
@@ -288,7 +344,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.e("KLE_restore: ", urlRTSP);
+        Log.e("KLE_restore: ", HTTP_URL);
 
         try {
             //we use onRestoreInstanceState in order to play the video playback from the stored position
@@ -306,6 +362,13 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception ex) {
             Log.e("KLE_onRestore: ", ex.toString());
         }
+    }
+
+    @Override
+    protected void onStop() {
+        if (htmlTask != null)
+            htmlTask.cancel(true);
+        super.onStop();
     }
 /*
     @Override

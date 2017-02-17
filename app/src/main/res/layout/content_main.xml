@@ -13,23 +13,46 @@
     tools:context="com.thexma.yicamviewer.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <ProgressBar style="?android:attr/progressBarStyleHorizontal"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarTask"
+        android:max="100"
+        android:progress="50"
+        android:visibility="visible"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_width="match_parent" />
+    <Button
+        android:layout_alignEnd="@+id/progressBarTask"
+        android:id="@+id/buttonProgressBar"
+        android:text="X"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
+
     <TextView
         android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:id="@+id/textViewHello"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button"
+        android:layout_below="@+id/progressBarTask"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/textViewHello"
-        android:textAppearance="@style/TextAppearance.AppCompat.Button" />
+        android:layout_marginTop="10dp" />
 
     <VideoView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewHello"
+        android:layout_marginTop="14dp"
+        android:id="@+id/videoViewLive"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="50dp"
-        android:id="@+id/videoViewLive" />
+        android:layout_alignParentStart="true" />
+
+
 
 </RelativeLayout>
