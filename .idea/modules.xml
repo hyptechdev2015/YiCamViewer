@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/YiCamViewer.iml" filepath="$PROJECT_DIR$/YiCamViewer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/all-fmmr/all-fmmr.iml" filepath="$PROJECT_DIR$/all-fmmr/all-fmmr.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/jsoup-1.10.2/jsoup-1.10.2.iml" filepath="$PROJECT_DIR$/jsoup-1.10.2/jsoup-1.10.2.iml" />
     </modules>
