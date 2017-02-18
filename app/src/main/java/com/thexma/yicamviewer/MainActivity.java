@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity
 
     public static DatabaseInterface datasource;
     public static SharedPreferences settings;
+    public static String HTTP_HOST;
     public static String HTTP_URL;
     public static String RSTP_URL;
 
@@ -58,12 +59,13 @@ public class MainActivity extends AppCompatActivity
     private String reachable = "0";
 
     private String finalS = "";
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -102,8 +104,10 @@ public class MainActivity extends AppCompatActivity
 
             String host = settings.getString("HostUrl", "none");
             String urlPort = settings.getString("HostPort", "333");
+            HTTP_HOST = "http://" + host;
             RSTP_URL = "rtsp://" + host + ":" + urlPort + "/ch0_1.h264";
             HTTP_URL = "http://" + host + "/record/";
+
 
             try {
                 reachable = new URLCheckTask(getApplicationContext()).execute(HTTP_URL).get();
@@ -315,6 +319,7 @@ public class MainActivity extends AppCompatActivity
             //finish();
         } else if (id == R.id.nav_gallery) {
             fragment = new EmptyFragment();
+            toolbar.setTitle("Gallery");
             showFragment(fragment);
 
         } else if (id == R.id.nav_slideshow) {
