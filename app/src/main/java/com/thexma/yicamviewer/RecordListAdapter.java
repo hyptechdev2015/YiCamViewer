@@ -63,15 +63,13 @@ public class RecordListAdapter extends ArrayAdapter<Record> {
         Bitmap bmThumbnail = null;
         //bmThumbnail = ThumbnailUtils.createVideoThumbnail(Uri.parse(videoUrl.toString()).toString(), MediaStore.Video.Thumbnails.MICRO_KIND);
         try {
-            bmThumbnail = Helper.getFFmpegMediaMetadataRetriever(this.cxt , videoUrl.toString());
+            bmThumbnail = Helper.getVideoFrameFromVideo(videoUrl.toString());
         }
         catch(Throwable t)
         {
             if (t instanceof Throwable) {
-                Log.e("-----------", t.toString());
+                //Log.e("-----------", t.toString());
             }
-
-
         }
         imageThumbnail.setImageBitmap(bmThumbnail);
 

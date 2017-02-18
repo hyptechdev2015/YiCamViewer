@@ -24,7 +24,6 @@
         android:id="@+id/eventListRecord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/eventText"
         android:layout_marginTop="1dp" >
     </ListView>
@@ -32,7 +31,6 @@
     <CalendarView
         android:id="@+id/calendarViewRecord"
         android:layout_width="match_parent"
-        android:layout_below="@+id/textViewRecord"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_height="150dp" />

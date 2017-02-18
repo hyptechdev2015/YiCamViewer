@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity
     private MediaController mediaControls;
 
 
-
     public static DatabaseInterface datasource;
     public static SharedPreferences settings;
     public static String HTTP_HOST;
@@ -102,8 +101,9 @@ public class MainActivity extends AppCompatActivity
                 editor.commit();
             }
 
-            String host = settings.getString("HostUrl", "none");
-            String urlPort = settings.getString("HostPort", "333");
+
+            String host = settings.getString("HostUrl", "");
+            String urlPort = settings.getString("HostPort", "");
             HTTP_HOST = "http://" + host;
             RSTP_URL = "rtsp://" + host + ":" + urlPort + "/ch0_1.h264";
             HTTP_URL = "http://" + host + "/record/";
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity
         try {
             if (htmlTask != null)
                 htmlTask.cancel(true);
-            savedInstanceState.putString("HTTP_URL", HTTP_URL);
+            savedInstanceState.putString("HTTP_URL", HTTP_URL + "");
             //we use onSaveInstanceState in order to store the video playback position for orientation change
             //savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
 /*            if (myVideoView == null)
@@ -400,17 +400,15 @@ public class MainActivity extends AppCompatActivity
             htmlTask.cancel(true);
         super.onStop();
     }
-/*
+
     @Override
     protected void onResume() {
-        datasource.open();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        datasource.close();
         super.onPause();
     }
-*/
+
 }

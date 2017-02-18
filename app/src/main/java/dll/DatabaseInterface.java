@@ -14,10 +14,16 @@ import java.util.ArrayList;
 
 public class DatabaseInterface {
     private SQLiteDatabase database;
+
+    //instance
     private MySQLiteHelper dbhelper;
 
-    public DatabaseInterface(Context context) {
-        dbhelper = new MySQLiteHelper(context);
+
+    public DatabaseInterface(Context context)
+    {
+        //dbhelper = new MySQLiteHelper(context);
+
+        dbhelper =  MySQLiteHelper.getInstance(context);
     }
 
     public void open() throws SQLException {
@@ -60,7 +66,7 @@ public class DatabaseInterface {
         return t;
     }
 
-    public Record getLastestRecord(){
+    public Record getLastestRecord() {
         Record rec = new Record();
         String selectQuery = "SELECT * FROM records ORDER BY column DESC LIMIT 1;";
         Cursor cursor = database.rawQuery(selectQuery, null);
@@ -73,16 +79,16 @@ public class DatabaseInterface {
 
     }
 
-    public void insertRecord(Record rec){
+    public void insertRecord(Record rec) {
         ContentValues values = new ContentValues();
         //Populate Teacher tables
         //values.put("id", 0);
-        values.put("foldername", rec.getFolderName() );
+        values.put("foldername", rec.getFolderName());
         values.put("filename", rec.getFileName());
         values.put("filedate", rec.getFileDate());
         values.put("filesize", rec.getFileSize());
         values.put("fullurl", rec.getFullUrl());
-        values.put("date", rec.getDate() );
+        values.put("date", rec.getDate());
         database.insert("records", null, values);
         values.clear();
 

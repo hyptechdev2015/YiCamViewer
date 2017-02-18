@@ -85,10 +85,11 @@ public class RecordActivity extends AppCompatActivity {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
                 try {
+
                     cal = new GregorianCalendar(year, month, dayOfMonth);
                     int date = Integer.parseInt(sdf.format(cal.getTime()));
 
-                    eventList = MainActivity.datasource.getRecord(date);
+                    eventList =  MainActivity.datasource.getRecord(date);
                     adapter = new RecordListAdapter(getApplicationContext(), R.layout.notification_list_item, eventList);
                     listview = (ListView) findViewById(R.id.eventListRecord);
                     listview.setAdapter(adapter);
@@ -166,6 +167,21 @@ public class RecordActivity extends AppCompatActivity {
             return datePickerDialog;
         }
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
 /*    public class RecordDateFragment extends DialogFragment implements CalendarView.OnDateChangeListener{

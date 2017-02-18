@@ -17,7 +17,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 
-import wseemann.media.FFmpegMediaMetadataRetriever;
+//import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Created by kle on 2/16/2017.
@@ -72,7 +72,7 @@ public class Helper {
         catch (Exception e)
         {
             e.printStackTrace();
-            throw new Throwable("Exception in getVideoFrameFromVideo(String videoPath)" + e.getMessage());
+            throw new Throwable("getVideoFrameFromVideo("+videoPath+")" + e.getMessage());
 
         }
         finally
@@ -85,7 +85,7 @@ public class Helper {
         return bitmap;
     }
 
-    public static Bitmap getFFmpegMediaMetadataRetriever(Context con, String image_url) throws Throwable
+/*    public static Bitmap getFFmpegMediaMetadataRetriever(Context con, String image_url) throws Throwable
     {
         Bitmap b = null;
         FFmpegMediaMetadataRetriever mmr = null;
@@ -97,7 +97,7 @@ public class Helper {
         catch(Exception e)
         {
             e.printStackTrace();
-            throw new Throwable("Exception in getVideoFrameFromVideo(String videoPath)" + e.getMessage());
+            throw new Throwable("getFFmpegMediaMetadataRetriever("+image_url+") " + e.getMessage());
         }
         finally
         {
@@ -110,5 +110,5 @@ public class Helper {
         Log.e("-------getFFmpegMedia", "Size of NEW bitmap is " + String.valueOf(b.getByteCount()) );
         //holder.Img.setImageBitmap(b);
         return  b;
-    }
+    }*/
 }

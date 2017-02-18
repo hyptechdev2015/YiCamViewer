@@ -20,6 +20,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String RECORDS_FULLURL = "fullurl";
     public static final String RECORDS_DATE = "date";
 
+    private static MySQLiteHelper sInstance;
     private static final String DATABASE_NAME = "db_yicamviewer";
     private static final int DATABASE_VERSION = 3;
 
@@ -30,7 +31,22 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             RECORDS_FILESIZE + " text not null, " + RECORDS_FULLURL + " text not null, " +  RECORDS_DATE + " integer not null);";
 
 
-    public MySQLiteHelper(Context context){
+    public static synchronized MySQLiteHelper getInstance(Context context) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (sInstance == null) {
+            sInstance = new MySQLiteHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    /**
+     * Constructor should be private to prevent direct instantiation.
+     * make call to static method "getInstance()" instead.
+     */
+    private  MySQLiteHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
