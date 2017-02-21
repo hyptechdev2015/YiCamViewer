@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.net.URI;
 import java.util.List;
+
 import com.thexma.*;
 
 import dll.Helper;
@@ -29,7 +30,7 @@ import dll.Record;
 
 public class RecordListAdapter extends ArrayAdapter<Record> {
     private List<Record> data = null;
-    private static LayoutInflater inflater=null;
+    private static LayoutInflater inflater = null;
     private Context cxt;
 
     public RecordListAdapter(Context context, int layoutResourceId, List<Record> data) {
@@ -38,61 +39,69 @@ public class RecordListAdapter extends ArrayAdapter<Record> {
         this.cxt = context;
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
-
+        Bitmap bmThumbnail = null;
         View row = convertView;
-        if(convertView == null){
+        if (convertView == null) {
             inflater = LayoutInflater.from(getContext());
             row = inflater.inflate(R.layout.record_list_item, null);
         }
-/*        if(row==null){
-            LayoutInflater inflater=getLayoutInflater();
-            row=inflater.inflate(R.layout.row, parent, false);
-        }*/
 
         Record e = data.get(position);
+        int recordID = e.getID();
 
-        String videoUrl = MainActivity.HTTP_HOST + e.getFullUrl().toString();
+        byte[] thumbnail = e.getThumbnail();
 
-        TextView textfilePath = (TextView)row.findViewById(R.id.FilePath);
-        textfilePath.setText(videoUrl);
-        ImageView imageThumbnail = (ImageView)row.findViewById(R.id.Thumbnail);
+        String videoUrl = MainActivity.HTTP_URL + e.getFullUrl().toString();
 
-        Bitmap bmThumbnail = null;
-        //bmThumbnail = ThumbnailUtils.createVideoThumbnail(Uri.parse(videoUrl.toString()).toString(), MediaStore.Video.Thumbnails.MICRO_KIND);
-        try {
-            bmThumbnail = Helper.getVideoFrameFromVideo(videoUrl.toString());
-        }
-        catch(Throwable t)
-        {
-            if (t instanceof Throwable) {
-                //Log.e("-----------", t.toString());
+        TextView textfilePath = (TextView) row.findViewById(R.id.FilePath);
+        textfilePath.setText(videoUrl.toString());
+
+        TextView textDate = (TextView) row.findViewById(R.id.textViewDate   );
+        textDate.setText(e.getFileDate());
+        ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
+
+/*        try {
+            //bmThumbnail = Helper.getVideoFrameFromVideo(videoUrl.toString());
+
+            if (imageThumbnail != null) {
+                if (thumbnail == null)
+                    new ImageDownloaderTask(imageThumbnail, MainActivity.datasource, recordID).execute(videoUrl.toString());
+                else
+                    imageThumbnail.setImageBitmap(Helper.getImage(thumbnail));
+
             }
-        }
-        imageThumbnail.setImageBitmap(bmThumbnail);
+
+
+        } catch (Throwable t) {
+            if (t instanceof Throwable) {
+                Log.e("-----------", t.toString());
+            }
+        }*/
+
 
         return row;
     }
 
 
-
     //@SuppressLint("DefaultLocale")
     //@Override
-    public View getView_TEST(int position, View convertView,ViewGroup parent) {
+    public View getView_TEST(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        if(convertView == null){
+        if (convertView == null) {
             inflater = LayoutInflater.from(getContext());
             row = inflater.inflate(R.layout.notification_list_item, null);
         }
 
 
-        TextView title = (TextView)row.findViewById(R.id.notificationTitle);
-        TextView description = (TextView)row.findViewById(R.id.notificationDescription);
+        TextView title = (TextView) row.findViewById(R.id.notificationTitle);
+        TextView description = (TextView) row.findViewById(R.id.notificationDescription);
 
         Record e = data.get(position);
-        title.setText(e.getFileName() + " | "+ e.getFileDate() + " | " + e.getFolderName());
+        title.setText(e.getFileName() + " | " + e.getFileDate() + " | " + e.getFolderName());
         description.setText(e.getFullUrl());
 
         return row;

@@ -21,13 +21,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private SharedPreferences settings;
 
-    private static EditText tV;
-    private static EditText tvPort;
-    //saving the context, so that we can call all
-    //shared pref methods from non activity classes.
-    //because getSharedPreferences required the context.
-    //but in activity class we can call without this context
-    private static Context mContext;
+
 
 /*    public static void Init(Context context)
     {
@@ -59,24 +53,29 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        //setContentView(R.layout.activity_settings);
 
-        // Restore preferences
-        //PREFS_NAME = getResources().getString(R.string.pref_file);
+        // Display the fragment as the main content.
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new SettingsFragment())
+               // .addToBackStack(null)
+                .commit();
 
-        settings = getSharedPreferences(this.PREFS_NAME.toString() , MODE_PRIVATE);
+
+
+/*        settings = getSharedPreferences(this.PREFS_NAME.toString() , MODE_PRIVATE);
         String urlRemote = "192.168.29.168";
         String url = settings.getString("HostUrl", urlRemote);
         tV = (EditText) findViewById(R.id.editTextHostUrl);
         tV.setText(url);
         String urlPort = settings.getString("HostPort", "554");
         tvPort = (EditText) findViewById(R.id.editTextPort);
-        tvPort.setText(urlPort);
+        tvPort.setText(urlPort);*/
 
     }
 
 
-    @Override
+/*    @Override
     protected void onStop() {
         super.onStop();
 
@@ -93,5 +92,6 @@ public class SettingsActivity extends AppCompatActivity {
         Intent intRecord = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intRecord);
         finish();
-    }
+    }*/
+
 }

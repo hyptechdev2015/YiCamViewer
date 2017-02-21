@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@style/PreferenceTheme">
+    <EditTextPreference
+
+        android:defaultValue="192.168.29.168"
+        android:key="host"
+        android:title="Host"
+        android:inputType="textUri"
+        android:summary="ex: google.com"/>
+    <EditTextPreference
+        android:defaultValue="554"
+        android:key="rtsp_port"
+        android:title="RTSP Port"
+        android:inputType="number"/>
+    <EditTextPreference
+        android:defaultValue="record"
+        android:key="record_path"
+        android:title="Record Files Path"
+        android:inputType="text"/>
+
+    <CheckBoxPreference android:title="Active" android:key="active"/>
+</PreferenceScreen>

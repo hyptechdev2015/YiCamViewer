@@ -6,49 +6,44 @@ import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import dll.*;
+import dll.DatabaseInterface;
+import dll.URLCheckTask;
+import dll.WebService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    private VideoView myVideoView;
-    private int position = 0;
-    private ProgressDialog progressDialog;
-    private MediaController mediaControls;
-
 
     public static DatabaseInterface datasource;
     public static SharedPreferences settings;
     public static String HTTP_HOST;
     public static String HTTP_URL;
     public static String RSTP_URL;
-
+    public static String HTTP_RECORD_URL;
+    private VideoView myVideoView;
+    private int position = 0;
+    private ProgressDialog progressDialog;
+    private MediaController mediaControls;
     private ProgressBar progressBar;
     private int count = 1;
 
@@ -89,6 +84,8 @@ public class MainActivity extends AppCompatActivity
         //my code
         try {
 
+            //PreferenceManager.setDefaultValues(this, R.xml.app_references, false);
+
             //settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), MODE_PRIVATE);
             //datasoure
@@ -102,11 +99,17 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-            String host = settings.getString("HostUrl", "");
-            String urlPort = settings.getString("HostPort", "");
+            String host;//= settings.getString("HostUrl", "");
+
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            host = sharedPref.getString("host", "");
+
+            String urlPort;// = settings.getString("HostPort", "");
+            urlPort = sharedPref.getString("rtsp_port", "");
             HTTP_HOST = "http://" + host;
             RSTP_URL = "rtsp://" + host + ":" + urlPort + "/ch0_1.h264";
-            HTTP_URL = "http://" + host + "/record/";
+            HTTP_URL = "http://" + host + "/" + sharedPref.getString("record_path", "") + "/";
+            HTTP_RECORD_URL = "http://" + host + "/" + sharedPref.getString("record_path", "") + "/";
 
 
             try {
@@ -115,23 +118,26 @@ public class MainActivity extends AppCompatActivity
                 Log.e("-------------", e.getMessage());
             }
 
-            if (host.length() > 0) {
+            if (host.length() > 0 && reachable =="1") {
                 TextView etHello = (TextView) findViewById(R.id.textViewHello);
 
-                Log.d("---------------host1", host.toString());
+                Log.d("---------------RSTP_URL", RSTP_URL.toString());
 
-                //LoadHTML();
+                LoadHTML();
                 LoadRTSP();
                 //testWebService();
-                Log.d("---------------host2", host.toString());
+                Log.d("---------------HTTP_URL", HTTP_URL.toString());
 
                 etHello.setText(finalS);
                 Log.d("---------------2", finalS.toString());
 
             } else {
-                Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(intRecord);
-                finish();
+/*                Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intRecord);*/
+
+                loadSettingFragment();
+                //finish();
+
             }
 
 
@@ -164,6 +170,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void LoadHTML() {
+        if (reachable == "0") {
+            Toast.makeText(getApplicationContext(), "LoadHTML Not Reachable", Toast.LENGTH_SHORT).show();
+            return;
+        }
         //progress bar
         progressBar = (ProgressBar) findViewById(R.id.progressBarTask);
         progressBar.setMax(100);
@@ -234,7 +244,7 @@ public class MainActivity extends AppCompatActivity
             myVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
-                    Log.e(" ---------------", "STOP");
+                    Log.e(" ---------------", "STOP:" + RSTP_URL);
                     progressDialog.dismiss();
                     myVideoView.stopPlayback();
                     //Toast.makeText(getApplicationContext(), "Can't stream video url", Toast.LENGTH_LONG).show();
@@ -281,10 +291,12 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
+/*            Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intRecord);
-            finish();
-            return true;
+            //finish();*/
+
+            loadSettingFragment();
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -323,6 +335,8 @@ public class MainActivity extends AppCompatActivity
             showFragment(fragment);
 
         } else if (id == R.id.nav_slideshow) {
+            Intent actPlayer = new Intent(getApplicationContext(), PlayerActivity.class);
+            startActivity(actPlayer);
 
         } else if (id == R.id.nav_share) {
 
@@ -335,6 +349,13 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
 
+    }
+
+    private void loadSettingFragment() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new SettingsFragment()) //android.R.id.content
+                .addToBackStack(null)
+                .commit();
     }
 
     private void showFragment(Fragment fragment) {
@@ -404,6 +425,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+
     }
 
     @Override

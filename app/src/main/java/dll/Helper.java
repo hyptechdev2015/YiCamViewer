@@ -2,14 +2,19 @@ package dll;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -55,9 +60,28 @@ public class Helper {
         return isReachable;
     }
 
+    public static byte[] getBytes(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,0,stream);
+        return stream.toByteArray();
+    }
+
+    public static Bitmap getImage(byte[] image){
+        return BitmapFactory.decodeByteArray(image,0,image.length);
+    }
+
+
     public static Bitmap getVideoFrameFromVideo(String videoPath)  throws Throwable
     {
         Bitmap bitmap = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+            bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.MICRO_KIND);
+            if (bitmap != null) {
+                return bitmap;
+            }
+        }
+
         MediaMetadataRetriever mediaMetadataRetriever = null;
         try
         {
@@ -66,8 +90,7 @@ public class Helper {
                 mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
             else
                 mediaMetadataRetriever.setDataSource(videoPath);
-            //   mediaMetadataRetriever.setDataSource(videoPath);
-            bitmap = mediaMetadataRetriever.getFrameAtTime();
+            bitmap = mediaMetadataRetriever.getFrameAtTime(1);
         }
         catch (Exception e)
         {
@@ -84,6 +107,32 @@ public class Helper {
         }
         return bitmap;
     }
+/*
+    private static Bitmap downloadBitmap(String url) {
+        HttpURLConnection urlConnection = null;
+        try {
+            URL uri = new URL(url);
+            urlConnection = (HttpURLConnection) uri.openConnection();
+            int statusCode = urlConnection.getResponseCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                return null;
+            }
+
+            InputStream inputStream = urlConnection.getInputStream();
+            if (inputStream != null) {
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                return bitmap;
+            }
+        } catch (Exception e) {
+            urlConnection.disconnect();
+            Log.w("ImageDownloader", "Error downloading image from " + url);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+        return null;
+    }*/
 
 /*    public static Bitmap getFFmpegMediaMetadataRetriever(Context con, String image_url) throws Throwable
     {

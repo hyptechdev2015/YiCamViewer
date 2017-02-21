@@ -19,11 +19,10 @@ public class DatabaseInterface {
     private MySQLiteHelper dbhelper;
 
 
-    public DatabaseInterface(Context context)
-    {
+    public DatabaseInterface(Context context) {
         //dbhelper = new MySQLiteHelper(context);
 
-        dbhelper =  MySQLiteHelper.getInstance(context);
+        dbhelper = MySQLiteHelper.getInstance(context);
     }
 
     public void open() throws SQLException {
@@ -49,8 +48,11 @@ public class DatabaseInterface {
 
     public ArrayList<Record> getRecord(int date) {
         ArrayList<Record> res = new ArrayList<Record>();
-
-        Cursor cursor = database.query("records", null, "date = " + date, null, null, null, "id");
+        Cursor cursor;
+        if (date == -1)
+            cursor = database.query("records", null, null, null, null, null, "id");
+        else
+            cursor = database.query("records", null, "date = " + date, null, null, null, "id");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Record e = cursorToRecord(cursor);
@@ -62,7 +64,7 @@ public class DatabaseInterface {
     }
 
     private Record cursorToRecord(Cursor c) {
-        Record t = new Record(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), c.getInt(6));
+        Record t = new Record(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), c.getInt(6), c.getBlob(7));
         return t;
     }
 
@@ -79,6 +81,15 @@ public class DatabaseInterface {
 
     }
 
+    public boolean updateRecordThumbnail(long rowId, byte[] image)
+    {
+        ContentValues args = new ContentValues();
+        args.put(MySQLiteHelper.RECORDS_ID, rowId);
+        args.put( MySQLiteHelper.RECORDS_THUMBNAIL, image);
+        int i =  database.update(MySQLiteHelper.TABLE_RECORDS, args, MySQLiteHelper.RECORDS_ID + "=" + rowId, null);
+        return i > 0;
+    }
+
     public void insertRecord(Record rec) {
         ContentValues values = new ContentValues();
         //Populate Teacher tables
@@ -89,6 +100,7 @@ public class DatabaseInterface {
         values.put("filesize", rec.getFileSize());
         values.put("fullurl", rec.getFullUrl());
         values.put("date", rec.getDate());
+        values.put("image_data", rec.getThumbnail());
         database.insert("records", null, values);
         values.clear();
 
@@ -104,6 +116,7 @@ public class DatabaseInterface {
         values.put("filesize", "2155868");
         values.put("fullurl", "/record/2017Y02M15D16H/20M00S.mp4");
         values.put("date", 20170215);
+        values.put("image_data", "null");
         database.insert("records", null, values);
         values.clear();
         //values.put("id", 1);
@@ -113,6 +126,7 @@ public class DatabaseInterface {
         values.put("filesize", "850861");
         values.put("fullurl", "/record/2017Y02M13D18H/01M00S.mp4");
         values.put("date", 20170214);
+        values.put("image_data", "null");
         database.insert("records", null, values);
         values.clear();
 

@@ -35,6 +35,7 @@ import java.util.TimeZone;
 import dll.*;
 
 public class RecordActivity extends AppCompatActivity {
+   // public static DatabaseInterface datasource;
 
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
     public GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("US/Central"));
@@ -48,6 +49,8 @@ public class RecordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
 
+        //datasource = new DatabaseInterface(this);
+       // datasource.open();
 
         settings = getSharedPreferences(SettingsActivity.PREFS_NAME, MODE_PRIVATE);
         //"http://192.168.29.168/record/"
@@ -95,8 +98,8 @@ public class RecordActivity extends AppCompatActivity {
                     listview.setAdapter(adapter);
 
 
-                    String str = "day: " + dayOfMonth + " month: " + month + " year: " + year + " Integer: " + Integer.parseInt(sdf.format(cal.getTime()));
-                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
+//                    String str = "day: " + dayOfMonth + " month: " + month + " year: " + year + " Integer: " + Integer.parseInt(sdf.format(cal.getTime()));
+                    //Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
                 } catch (Exception ex) {
                     Log.e(" here: ", ex.toString());
                 }

@@ -5,21 +5,45 @@
     android:orientation="horizontal"
     android:weightSum="1">
 
-    <ImageView
-
-        android:id="@+id/Thumbnail"
-
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:src="@mipmap/icon_thumbnail" />
+        android:layout_weight="0.25">
+        <ImageView
 
+            android:id="@+id/Thumbnail"
+            android:layout_width="150dp"
+            android:layout_height="34dp"
 
-    <TextView
-        android:id="@+id/FilePath"
+            android:background="@drawable/placeholder"         />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:text="URL"
-        android:textColor="@color/colorPrimaryDark" />
+        android:layout_weight="0.75">
+        <TextView
+            android:text="textViewDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewDate"             />
+
+        <TextView
+            android:id="@+id/FilePath"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="URL"
+            android:layout_below="@id/textViewDate"
+            android:textColor="@color/colorPrimaryDark"
+             />
+
+    </RelativeLayout>
+
+
+
+
+
 </LinearLayout>

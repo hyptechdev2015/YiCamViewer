@@ -12,10 +12,11 @@ public class Record {
     private String fileSize;
     private String fullUrl;
     private int date;
+    private byte[] thumbnail;
 
     public Record(){}
 
-    public Record(int id, String folderName, String fileName, String fileDate, String fileSize, String fullUrl, int date){
+    public Record(int id, String folderName, String fileName, String fileDate, String fileSize, String fullUrl, int date, byte[] image){
         this.id = id;
         this.folderName = folderName;
         this.fileName = fileName;
@@ -23,6 +24,7 @@ public class Record {
         this.fileSize = fileSize;
         this.fullUrl = fullUrl;
         this.date = date;
+        this.thumbnail = image;
     }
 
     public void setID(int id ) {
@@ -61,10 +63,19 @@ public class Record {
         return fullUrl;
     }
 
+    public void setThumbnail(byte[] value){this.thumbnail = value;}
+    public byte[] getThumbnail(){
+        return thumbnail;
+    }
+
 
     @Override
     public String toString(){
-        return id + "," + folderName + "," + fileName + "," + fileDate + "," + fileSize + "," + fullUrl + "," + date;
+        String yesT="0";
+        if(thumbnail != null)
+            yesT = "1";
+
+        return id + "," + folderName + "," + fileName + "," + fileDate + "," + fileSize + "," + fullUrl + "," + date+","+ yesT;
     }
 
 }

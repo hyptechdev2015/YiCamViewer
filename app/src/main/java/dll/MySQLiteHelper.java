@@ -19,16 +19,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String RECORDS_FILESIZE = "filesize";
     public static final String RECORDS_FULLURL = "fullurl";
     public static final String RECORDS_DATE = "date";
+    public static final String RECORDS_THUMBNAIL = "image_data";
+
 
     private static MySQLiteHelper sInstance;
-    private static final String DATABASE_NAME = "db_yicamviewer";
-    private static final int DATABASE_VERSION = 3;
+    private static final String DATABASE_NAME = "db_yicamviewer.db";
+    private static final int DATABASE_VERSION = 1;
 
     //table creation statements
     private static final String RECORDS_CREATE = "create table " + TABLE_RECORDS + "( " +
             RECORDS_ID + " integer primary key AUTOINCREMENT, " + RECORDS_FOLDERNAME + " text not null, "
             + RECORDS_FILENAME + " text not null, " + RECORDS_FILEDATE + " DATETIME not null, " +
-            RECORDS_FILESIZE + " text not null, " + RECORDS_FULLURL + " text not null, " +  RECORDS_DATE + " integer not null);";
+            RECORDS_FILESIZE + " text not null, " + RECORDS_FULLURL + " text not null, " +  RECORDS_DATE + " integer not null," +  RECORDS_THUMBNAIL + " BLOB null);";
 
 
     public static synchronized MySQLiteHelper getInstance(Context context) {
