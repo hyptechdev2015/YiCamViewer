@@ -34,8 +34,10 @@ import java.util.TimeZone;
 
 import dll.*;
 
-public class RecordActivity extends AppCompatActivity {
+public class RecordActivity extends AppCompatActivity  {
    // public static DatabaseInterface datasource;
+
+    final String TAG = "--- MainActivity";
 
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
     public GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("US/Central"));

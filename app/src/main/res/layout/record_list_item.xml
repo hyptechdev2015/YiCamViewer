@@ -9,12 +9,12 @@
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.25">
+        >
         <ImageView
 
             android:id="@+id/Thumbnail"
-            android:layout_width="150dp"
-            android:layout_height="34dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
 
             android:background="@drawable/placeholder"         />
 
@@ -24,12 +24,13 @@
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.75">
+        >
         <TextView
             android:text="textViewDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewDate"             />
+            android:id="@+id/textViewDate"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <TextView
             android:id="@+id/FilePath"

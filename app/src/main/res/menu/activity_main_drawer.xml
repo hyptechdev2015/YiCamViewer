@@ -12,11 +12,11 @@
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="Test Fragment" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="ExoplayerTest" />
     </group>
 
     <item android:title="Communicate">
@@ -24,7 +24,7 @@
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Test ffmmr" />
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"

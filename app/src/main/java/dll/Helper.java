@@ -90,7 +90,7 @@ public class Helper {
                 mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
             else
                 mediaMetadataRetriever.setDataSource(videoPath);
-            bitmap = mediaMetadataRetriever.getFrameAtTime(1);
+            bitmap = mediaMetadataRetriever.getFrameAtTime();
         }
         catch (Exception e)
         {

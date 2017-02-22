@@ -3,10 +3,14 @@ package com.thexma.yicamviewer;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -28,14 +32,17 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import dll.DatabaseInterface;
+import dll.Helper;
 import dll.URLCheckTask;
 import dll.WebService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    final String TAG = "--- MainActivity";
     public static DatabaseInterface datasource;
     public static SharedPreferences settings;
+
     public static String HTTP_HOST;
     public static String HTTP_URL;
     public static String RSTP_URL;
@@ -117,14 +124,21 @@ public class MainActivity extends AppCompatActivity
             } catch (Exception e) {
                 Log.e("-------------", e.getMessage());
             }
+            if (reachable == "1")
+                Toast.makeText(this, "Reachable", Toast.LENGTH_SHORT).show();
+            else {
+                Toast.makeText(this, "Unreachable", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            if (host.length() > 0 && reachable =="1") {
+            if (host.length() > 0) {
                 TextView etHello = (TextView) findViewById(R.id.textViewHello);
 
                 Log.d("---------------RSTP_URL", RSTP_URL.toString());
 
-                LoadHTML();
+                //LoadHTML();
                 LoadRTSP();
+                //loadRTSPPreview();
                 //testWebService();
                 Log.d("---------------HTTP_URL", HTTP_URL.toString());
 
@@ -186,23 +200,57 @@ public class MainActivity extends AppCompatActivity
         htmlTask.execute(HTTP_URL);
     }
 
+    private void loadRTSPPreview() {
+
+        if (reachable == "0") {
+            Toast.makeText(getApplicationContext(), "Ureachable", Toast.LENGTH_LONG).show();
+            return;
+        }
+        //initialize the VideoView
+        myVideoView = (VideoView) findViewById(R.id.videoViewLive);
+        Bitmap thumbnail = null;
+        try {
+
+            thumbnail = Helper.getVideoFrameFromVideo(RSTP_URL);
+
+            Thread.sleep(3000);
+            BitmapDrawable bitmapDrawable = new BitmapDrawable(thumbnail);
+            myVideoView.setBackground(bitmapDrawable);
+            myVideoView.seekTo(0);
+        } catch (Exception ex) {
+
+            Log.e("-----------", ex.toString());
+        } catch (Throwable t) {
+
+            Log.e("-----------", t.toString());
+        }
+    }
+
+    private void stopRTSP() {
+        progressDialog.dismiss();
+        myVideoView.stopPlayback();
+        Log.i(TAG, "stop LoadRTSP");
+    }
+
     private void LoadRTSP() {
 
         if (reachable == "0") {
             Toast.makeText(getApplicationContext(), "URL Not Reachable", Toast.LENGTH_LONG).show();
             return;
         }
-
+        Log.i(TAG, "resume/start LoadRTSP");
 
         //set the media controller buttons
         if (mediaControls == null) {
             mediaControls = new MediaController(this);
         }
         //initialize the VideoView
-        myVideoView = (VideoView) findViewById(R.id.videoViewLive);
+        if (myVideoView == null)
+            myVideoView = (VideoView) findViewById(R.id.videoViewLive);
 
         // create a progress bar while the video file is loading
-        progressDialog = new ProgressDialog(this);
+        if (progressDialog == null)
+            progressDialog = new ProgressDialog(this);
         // set a title for the progress bar
         progressDialog.setTitle("RTSP Stream Channels");
         // set a message for the progress bar
@@ -308,10 +356,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         Fragment fragment = null;
+        stopRTSP();
 
         if (id == R.id.nav_records) {
-            if (myVideoView != null)
-                myVideoView.pause();
+
             Intent intRecord = new Intent(getApplicationContext(), RecordActivity.class);
             startActivity(intRecord);
 
@@ -323,6 +371,7 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if (id == R.id.nav_camera) {
+
             if (myVideoView != null)
                 myVideoView.pause();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(RSTP_URL));
@@ -330,6 +379,7 @@ public class MainActivity extends AppCompatActivity
 
             //finish();
         } else if (id == R.id.nav_gallery) {
+
             fragment = new EmptyFragment();
             toolbar.setTitle("Gallery");
             showFragment(fragment);
@@ -339,6 +389,9 @@ public class MainActivity extends AppCompatActivity
             startActivity(actPlayer);
 
         } else if (id == R.id.nav_share) {
+
+            Intent intTest = new Intent(getApplicationContext(), TestFMMRActivity.class);
+            startActivity(intTest);
 
         } else if (id == R.id.nav_send) {
 
@@ -420,13 +473,13 @@ public class MainActivity extends AppCompatActivity
         if (htmlTask != null)
             htmlTask.cancel(true);
         super.onStop();
+        stopRTSP();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-
+        LoadRTSP();
     }
 
     @Override

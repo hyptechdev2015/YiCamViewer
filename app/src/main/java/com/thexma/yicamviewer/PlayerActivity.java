@@ -3,6 +3,7 @@ package com.thexma.yicamviewer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -22,7 +23,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 
 public class PlayerActivity extends AppCompatActivity  implements
         PlaybackControlView.VisibilityListener  {
-
+    final String TAG = "--- MainActivity";
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer exoPlayer;
 
@@ -39,7 +40,11 @@ public class PlayerActivity extends AppCompatActivity  implements
         LoadControl loadControl = new DefaultLoadControl();
         exoPlayer = ExoPlayerFactory.newSimpleInstance(getApplicationContext(), trackSelector, loadControl);
 
-        Uri audioUri = Uri.parse("http://192.168.29.168/record/2017Y01M27D10H/29M00S.mp4");
+        String urlMP4 =  MainActivity.HTTP_RECORD_URL + "2017Y01M27D10H/29M00S.mp4";
+        String urlRTSP = MainActivity.RSTP_URL;
+
+        Uri audioUri = Uri.parse( urlRTSP);
+        Log.i(TAG, urlRTSP);
         DefaultHttpDataSourceFactory dataSourceFactory = new DefaultHttpDataSourceFactory("ExoPlayerDemo");
         ExtractorsFactory extractor = new DefaultExtractorsFactory();
         MediaSource audioSource = new ExtractorMediaSource(audioUri, dataSourceFactory, extractor, null, null);

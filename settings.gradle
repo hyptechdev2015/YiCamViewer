@@ -1,1 +1,1 @@
-include ':app', ':jsoup-1.10.2', ':all-fmmr', ':exoplayer-debug'
+include ':app', ':jsoup-1.10.2', ':exoplayer-debug', ':armv7-fmmr'
