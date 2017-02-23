@@ -3,13 +3,13 @@ package dll;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 
 /**
  * Created by kle on 2/15/2017.
  */
 
-public class MySQLiteHelper extends SQLiteOpenHelper {
-
+public class RecordDB extends SQLiteOpenHelper {
     //Record Table
     public static final String TABLE_RECORDS = "records";
     public static final String RECORDS_ID = "id";
@@ -22,7 +22,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String RECORDS_THUMBNAIL = "image_data";
 
 
-    private static MySQLiteHelper sInstance;
+    private static RecordDB sInstance;
     private static final String DATABASE_NAME = "db_yicamviewer.db";
     private static final int DATABASE_VERSION = 1;
 
@@ -33,13 +33,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             RECORDS_FILESIZE + " text not null, " + RECORDS_FULLURL + " text not null, " +  RECORDS_DATE + " integer not null," +  RECORDS_THUMBNAIL + " BLOB null);";
 
 
-    public static synchronized MySQLiteHelper getInstance(Context context) {
+    public static synchronized RecordDB getInstance(Context context) {
 
         // Use the application context, which will ensure that you
         // don't accidentally leak an Activity's context.
         // See this article for more information: http://bit.ly/6LRzfx
         if (sInstance == null) {
-            sInstance = new MySQLiteHelper(context.getApplicationContext());
+            sInstance = new RecordDB(context.getApplicationContext());
         }
         return sInstance;
     }
@@ -48,7 +48,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
      * Constructor should be private to prevent direct instantiation.
      * make call to static method "getInstance()" instead.
      */
-    private  MySQLiteHelper(Context context){
+    private RecordDB(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

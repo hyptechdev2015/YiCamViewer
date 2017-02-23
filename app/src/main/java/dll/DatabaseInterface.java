@@ -16,13 +16,13 @@ public class DatabaseInterface {
     private SQLiteDatabase database;
 
     //instance
-    private MySQLiteHelper dbhelper;
+    private RecordDB dbhelper;
 
 
     public DatabaseInterface(Context context) {
-        //dbhelper = new MySQLiteHelper(context);
+        //dbhelper = new RecordDB(context);
 
-        dbhelper = MySQLiteHelper.getInstance(context);
+        dbhelper = RecordDB.getInstance(context);
     }
 
     public void open() throws SQLException {
@@ -84,9 +84,9 @@ public class DatabaseInterface {
     public boolean updateRecordThumbnail(long rowId, byte[] image)
     {
         ContentValues args = new ContentValues();
-        args.put(MySQLiteHelper.RECORDS_ID, rowId);
-        args.put( MySQLiteHelper.RECORDS_THUMBNAIL, image);
-        int i =  database.update(MySQLiteHelper.TABLE_RECORDS, args, MySQLiteHelper.RECORDS_ID + "=" + rowId, null);
+        args.put(RecordDB.RECORDS_ID, rowId);
+        args.put( RecordDB.RECORDS_THUMBNAIL, image);
+        int i =  database.update(RecordDB.TABLE_RECORDS, args, RecordDB.RECORDS_ID + "=" + rowId, null);
         return i > 0;
     }
 

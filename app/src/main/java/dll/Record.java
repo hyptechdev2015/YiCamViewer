@@ -1,11 +1,17 @@
 package dll;
 
+import android.content.ContentResolver;
+import android.net.Uri;
+import android.provider.BaseColumns;
+
 /**
  * Created by kle on 2/15/2017.
  */
 
-public class Record {
-    public  int id;
+public class Record implements BaseColumns {
+
+    //private variables
+    private  int id;
     private  String folderName;
     private  String fileName;
     private String fileDate;

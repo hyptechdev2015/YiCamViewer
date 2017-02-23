@@ -30,6 +30,15 @@ import java.util.HashMap;
  */
 
 public class Helper {
+
+    private static final int NET_CONNECT_TIMEOUT_MILLIS = 15000;  // 15 seconds
+
+    /**
+     * Network read timeout, in milliseconds.
+     */
+    private static final int NET_READ_TIMEOUT_MILLIS = 10000;  // 10 seconds
+
+
     public static Boolean isNetwork(Context Context) {
         ConnectivityManager cm = (ConnectivityManager) Context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -108,6 +117,21 @@ public class Helper {
         }
         return bitmap;
     }
+
+    public static InputStream downloadUrl(final URL url) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(NET_READ_TIMEOUT_MILLIS /* milliseconds */);
+        conn.setConnectTimeout(NET_CONNECT_TIMEOUT_MILLIS /* milliseconds */);
+        conn.setRequestMethod("GET");
+        conn.setDoInput(true);
+        // Starts the query
+        conn.connect();
+        return conn.getInputStream();
+    }
+
+
+    //String stringFromStream = CharStreams.toString(new InputStreamReader(fis, "UTF-8"));
+
 
 
 /*

@@ -227,8 +227,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void stopRTSP() {
-        progressDialog.dismiss();
-        myVideoView.stopPlayback();
+        if (progressDialog != null)
+            progressDialog.dismiss();
+        if (myVideoView != null)
+            myVideoView.stopPlayback();
         Log.i(TAG, "stop LoadRTSP");
     }
 
