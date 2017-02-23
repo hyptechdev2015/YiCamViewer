@@ -11,7 +11,7 @@ import android.provider.BaseColumns;
 public class Record implements BaseColumns {
 
     //private variables
-    private  int id;
+    private  long id;
     private  String folderName;
     private  String fileName;
     private String fileDate;
@@ -22,7 +22,7 @@ public class Record implements BaseColumns {
 
     public Record(){}
 
-    public Record(int id, String folderName, String fileName, String fileDate, String fileSize, String fullUrl, int date, byte[] image){
+    public Record(long id, String folderName, String fileName, String fileDate, String fileSize, String fullUrl, int date, byte[] image){
         this.id = id;
         this.folderName = folderName;
         this.fileName = fileName;
@@ -36,7 +36,7 @@ public class Record implements BaseColumns {
     public void setID(int id ) {
         this.id = id;
     }
-    public int getID(){
+    public long getID(){
         return id;
     }
 
@@ -81,7 +81,7 @@ public class Record implements BaseColumns {
         if(thumbnail != null)
             yesT = "1";
 
-        return id + "," + folderName + "," + fileName + "," + fileDate + "," + fileSize + "," + fullUrl + "," + date+","+ yesT;
+        return id + "," + folderName + "," + fileName + "," + fileDate + "," + fileSize + "," + date +","+ yesT + "," +  fullUrl  ;
     }
 
 }

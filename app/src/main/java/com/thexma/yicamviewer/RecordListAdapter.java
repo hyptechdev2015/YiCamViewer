@@ -51,7 +51,7 @@ public class RecordListAdapter extends ArrayAdapter<Record> {
         }
 
         Record e = data.get(position);
-        int recordID = e.getID();
+        long recordID = e.getID();
 
         byte[] thumbnail = e.getThumbnail();
 

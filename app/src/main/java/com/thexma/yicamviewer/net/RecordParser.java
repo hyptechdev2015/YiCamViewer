@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Exchanger;
 
 
 import dll.Record;
@@ -30,7 +31,7 @@ public class RecordParser {
 
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-    private SimpleDateFormat sdfUnique = new SimpleDateFormat("yyyyMMddHHmm", Locale.US);
+    private SimpleDateFormat sdfUnique = new SimpleDateFormat("yyyyMMddHHmm");
     //    private GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("US/Central"));
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMMyyyy HH:mm");
     private SimpleDateFormat databaseDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -38,7 +39,7 @@ public class RecordParser {
     public List<Record> parse(String url) throws XmlPullParserException, IOException, ParseException {
         recordList = new ArrayList<Record>();
 
-        int uniquDateID;
+        long uniquDateID;
         int dateIntSearch;
         String fullPath = "";
         String folder = "";
@@ -49,7 +50,7 @@ public class RecordParser {
 
         try {
             doc = Jsoup.connect(url).get();
-            Log.i(TAG, "started");
+            Log.i(TAG, "------------------------------------------------------------started");
             Elements folders = doc.select("PRE > a");
 
 
@@ -58,7 +59,7 @@ public class RecordParser {
                 //Log.d("-----------------", "elements are: " + item);
                 folder = item.attr("href");
                 folderText = item.text();
-                if (folder.length() > 3) {
+                if (folder.length() >= 14) {
                     fullPath = url + folder + "/";
                     docSub = Jsoup.connect(fullPath).get();
                     String mp4Path = "";
@@ -82,15 +83,15 @@ public class RecordParser {
 
                                 mp4DateTime = simpleDateFormat.parse(mp4NameDateTime);
 
-                                String fullUrl = url + folder + "/" + mp4FileName;
+                                String fullUrl =  folder + "/" + mp4FileName;
 
                                 dateIntSearch = Integer.parseInt(sdf.format(mp4DateTime.getTime()));
                                 //id
-                                uniquDateID = Integer.parseInt(sdfUnique.format(mp4DateTime.getTime()));
+                                uniquDateID = Long.parseLong(sdfUnique.format(mp4DateTime.getTime()) );
 
                                 Record rec = new Record(uniquDateID, folder, mp4FileName, databaseDateFormat.format(mp4DateTime).toString(), fileSize, fullUrl, dateIntSearch, null);
                                 recordList.add(rec);
-
+                                Log.i(TAG, rec.toString());
                             } catch (ParseException ex) {
                                 Log.e(TAG, ex.toString());
 //                                System.out.println("Exception " + ex);
@@ -102,13 +103,11 @@ public class RecordParser {
 
             }
 
-        } finally {
-            if (docSub != null)
-                docSub.remove();
-            if (doc != null)
-                doc.remove();
-
         }
+        catch(Exception ex){
+            Log.e(TAG, ex.toString());
+        }
+
         return recordList;
     }
 }

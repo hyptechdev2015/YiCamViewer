@@ -1,4 +1,5 @@
-package com.thexma.yicamviewer.common.account;
+package com.thexma.yicamviewer.common.accounts;
+
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

@@ -44,15 +44,24 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="10dp" />
 
+    <Button
+
+        android:text="Sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewHello"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/buttonSync" />
+
     <VideoView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewHello"
+        android:layout_below="@+id/buttonSync"
         android:layout_marginTop="14dp"
         android:id="@+id/videoViewLive"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
 
 
 </RelativeLayout>

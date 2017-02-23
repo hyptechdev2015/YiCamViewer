@@ -1,6 +1,8 @@
 package com.thexma.yicamviewer;
 
+import android.accounts.Account;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -30,6 +32,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import com.thexma.yicamviewer.adapter.SyncService;
+import com.thexma.yicamviewer.adapter.SyncUtils;
+import com.thexma.yicamviewer.common.accounts.GenericAccountService;
 
 import dll.DatabaseInterface;
 import dll.Helper;
@@ -62,6 +68,8 @@ public class MainActivity extends AppCompatActivity
     private String finalS = "";
     private Toolbar toolbar;
 
+    private Account mConnectedAccount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +85,6 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -89,6 +96,21 @@ public class MainActivity extends AppCompatActivity
 
 
         //my code
+        //mConnectedAccount = GenericAccountService.GetAccount(SyncUtils.ACCOUNT_TYPE);
+        SyncUtils.CreateSyncAccount(getApplicationContext());
+
+        findViewById(R.id.buttonSync).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+/*                if (mConnectedAccount == null) {
+                    Toast.makeText(MainActivity.this, "Connect first time", Toast.LENGTH_SHORT).show();
+                    SyncUtils.CreateSyncAccount(getApplicationContext());
+                    //return;
+                } else*/
+                    SyncUtils.TriggerRefresh();
+
+            }
+        });
         try {
 
             //PreferenceManager.setDefaultValues(this, R.xml.app_references, false);
@@ -98,12 +120,12 @@ public class MainActivity extends AppCompatActivity
             //datasoure
             datasource = new DatabaseInterface(this);
             datasource.open();
-            if (!settings.getBoolean("firstTime", false)) {
+/*            if (!settings.getBoolean("firstTime", false)) {
                 datasource.simulateExternalDatabase();
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putBoolean("firstTime", true);
                 editor.commit();
-            }
+            }*/
 
 
             String host;//= settings.getString("HostUrl", "");
@@ -132,12 +154,14 @@ public class MainActivity extends AppCompatActivity
             }
 
             if (host.length() > 0) {
+
+
                 TextView etHello = (TextView) findViewById(R.id.textViewHello);
 
                 Log.d("---------------RSTP_URL", RSTP_URL.toString());
 
                 //LoadHTML();
-                LoadRTSP();
+                //LoadRTSP();
                 //loadRTSPPreview();
                 //testWebService();
                 Log.d("---------------HTTP_URL", HTTP_URL.toString());
@@ -161,6 +185,7 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
 
     private void testWebService() {
 

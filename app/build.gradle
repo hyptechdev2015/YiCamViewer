@@ -33,4 +33,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':x86_64-fmmr')
     compile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    compile project(':armv7-fmmr')
 }

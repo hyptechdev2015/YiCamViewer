@@ -39,7 +39,9 @@ import com.thexma.yicamviewer.net.RecordParser;
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = "--- SyncAdapter";
 
-    private static final String FEED_URL = "http://android-developers.blogspot.com/atom.xml";
+    private static final String FEED_URL = "http://192.168.29.168/record/";
+    // "http://android-developers.blogspot.com/atom.xml";
+
 
     private final ContentResolver mContentResolver;
 
@@ -93,6 +95,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
 
         Log.i(TAG, "Beginning network synchronization");
+        Log.d(TAG, "onPerformSync for account[" + account.name + "]");
         try {
             final URL location = new URL(FEED_URL);
             InputStream stream = null;
@@ -151,7 +154,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         // Build hash table of incoming entries
         HashMap<String, Record> entryMap = new HashMap<String, Record>();
         for (Record e : entries) {
-            entryMap.put(Integer.toString(e.getID()), e);
+            entryMap.put(Long.toString(e.getID()), e);
         }
 
         // Get list of all items
