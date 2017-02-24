@@ -19,7 +19,7 @@ import com.thexma.yicamviewer.provider.RecordContract;
 public class SyncUtils {
     private static final long SYNC_FREQUENCY = 60 * 60;  // 1 hour (in seconds)
     private static final String CONTENT_AUTHORITY = RecordContract.CONTENT_AUTHORITY;
-    private static final String PREF_SETUP_COMPLETE = "setup_complete";
+    public static final String PREF_SETUP_COMPLETE = "setup_complete";
     // Value below must match the account type specified in res/xml/syncadapter.xml
     public static final String ACCOUNT_TYPE = "com.thexma.yicamviewer.account";
 

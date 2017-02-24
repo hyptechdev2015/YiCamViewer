@@ -3,21 +3,30 @@
     android:theme="@style/PreferenceTheme">
     <EditTextPreference
 
-        android:defaultValue="192.168.29.168"
+        android:defaultValue="192.168.29.1688"
         android:key="host"
         android:title="Host"
         android:inputType="textUri"
         android:summary="ex: google.com"/>
     <EditTextPreference
+        android:summary="default: 554"
         android:defaultValue="554"
         android:key="rtsp_port"
         android:title="RTSP Port"
         android:inputType="number"/>
     <EditTextPreference
+        android:summary="default: record"
         android:defaultValue="record"
         android:key="record_path"
         android:title="Record Files Path"
         android:inputType="text"/>
-
+    <EditTextPreference
+        android:summary="default: 60 minutes"
+        android:defaultValue="60"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Record Sync Frequence"
+        android:key="record_sync" />
     <CheckBoxPreference android:title="Active" android:key="active"/>
+
 </PreferenceScreen>

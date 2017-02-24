@@ -23,6 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
 
+
 /*    public static void Init(Context context)
     {
         mContext 		= context;

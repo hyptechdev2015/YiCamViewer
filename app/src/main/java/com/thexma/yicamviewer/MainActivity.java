@@ -2,17 +2,14 @@ package com.thexma.yicamviewer;
 
 import android.accounts.Account;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -29,21 +26,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.thexma.yicamviewer.adapter.SyncService;
 import com.thexma.yicamviewer.adapter.SyncUtils;
-import com.thexma.yicamviewer.common.accounts.GenericAccountService;
 
 import dll.DatabaseInterface;
 import dll.Helper;
-import dll.URLCheckTask;
 import dll.WebService;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener  {
 
     final String TAG = "--- MainActivity";
     public static DatabaseInterface datasource;
@@ -74,6 +67,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.i(TAG, "------------------------- onCreate");
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -102,90 +97,54 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.buttonSync).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SyncUtils.TriggerRefresh();
+
 /*                if (mConnectedAccount == null) {
                     Toast.makeText(MainActivity.this, "Connect first time", Toast.LENGTH_SHORT).show();
                     SyncUtils.CreateSyncAccount(getApplicationContext());
                     //return;
                 } else*/
-                    SyncUtils.TriggerRefresh();
 
             }
         });
-        try {
 
-            //PreferenceManager.setDefaultValues(this, R.xml.app_references, false);
+        //settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
+        //datasoure
+        datasource = new DatabaseInterface(this);
+        datasource.open();
+        if (!settings.getBoolean("firstTime", false)) {
+            stopRTSP();
+            loadSettingActivity();
 
-            //settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            settings = getSharedPreferences(SettingsActivity.PREFS_NAME.toString(), MODE_PRIVATE);
-            //datasoure
-            datasource = new DatabaseInterface(this);
-            datasource.open();
-/*            if (!settings.getBoolean("firstTime", false)) {
-                datasource.simulateExternalDatabase();
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("firstTime", true);
-                editor.commit();
-            }*/
+            //datasource.simulateExternalDatabase();
+            SharedPreferences.Editor editor = settings.edit();
 
-
-            String host;//= settings.getString("HostUrl", "");
-
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            host = sharedPref.getString("host", "");
-
-            String urlPort;// = settings.getString("HostPort", "");
-            urlPort = sharedPref.getString("rtsp_port", "");
-            HTTP_HOST = "http://" + host;
-            RSTP_URL = "rtsp://" + host + ":" + urlPort + "/ch0_1.h264";
-            HTTP_URL = "http://" + host + "/" + sharedPref.getString("record_path", "") + "/";
-            HTTP_RECORD_URL = "http://" + host + "/" + sharedPref.getString("record_path", "") + "/";
-
-
-            try {
-                reachable = new URLCheckTask(getApplicationContext()).execute(HTTP_URL).get();
-            } catch (Exception e) {
-                Log.e("-------------", e.getMessage());
-            }
-            if (reachable == "1")
-                Toast.makeText(this, "Reachable", Toast.LENGTH_SHORT).show();
-            else {
-                Toast.makeText(this, "Unreachable", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (host.length() > 0) {
-
-
-                TextView etHello = (TextView) findViewById(R.id.textViewHello);
-
-                Log.d("---------------RSTP_URL", RSTP_URL.toString());
-
-                //LoadHTML();
-                //LoadRTSP();
-                //loadRTSPPreview();
-                //testWebService();
-                Log.d("---------------HTTP_URL", HTTP_URL.toString());
-
-                etHello.setText(finalS);
-                Log.d("---------------2", finalS.toString());
-
-            } else {
-/*                Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(intRecord);*/
-
-                loadSettingFragment();
-                //finish();
-
-            }
-
-
-        } catch (Exception ex) {
-            Log.e(" ---------: ", ex.toString());
+            editor.putBoolean("firstTime", true);
+            editor.commit();
         }
+
+//        loadSettingData();
+        //settings.registerOnSharedPreferenceChangeListener(this);
 
 
     }
 
+    private void loadSettingData() {
+        String host;//= settings.getString("HostUrl", "");
+        host = settings.getString("host", "");
+
+        String urlPort;// = settings.getString("HostPort", "");
+        urlPort = settings.getString("rtsp_port", "");
+        HTTP_HOST = "http://" + host;
+        RSTP_URL = "rtsp://" + host + ":" + urlPort + "/ch0_1.h264";
+        HTTP_URL = "http://" + host + "/" + settings.getString("record_path", "") + "/";
+        HTTP_RECORD_URL = "http://" + host + "/" + settings.getString("record_path", "") + "/";
+        Log.i(TAG, "---------------------------- loadSettingData: " + HTTP_URL);
+        Log.i(TAG, "---------------------------- SyncUtils(setup complete): " + settings.getBoolean(SyncUtils.PREF_SETUP_COMPLETE,false) );
+
+
+    }
 
     private void testWebService() {
 
@@ -227,10 +186,7 @@ public class MainActivity extends AppCompatActivity
 
     private void loadRTSPPreview() {
 
-        if (reachable == "0") {
-            Toast.makeText(getApplicationContext(), "Ureachable", Toast.LENGTH_LONG).show();
-            return;
-        }
+
         //initialize the VideoView
         myVideoView = (VideoView) findViewById(R.id.videoViewLive);
         Bitmap thumbnail = null;
@@ -260,11 +216,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void LoadRTSP() {
-
-        if (reachable == "0") {
-            Toast.makeText(getApplicationContext(), "URL Not Reachable", Toast.LENGTH_LONG).show();
-            return;
-        }
         Log.i(TAG, "resume/start LoadRTSP");
 
         //set the media controller buttons
@@ -357,6 +308,12 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void loadSettingActivity()
+    {
+        Intent settingAct = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(settingAct);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -366,12 +323,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-/*            Intent intRecord = new Intent(getApplicationContext(), SettingsActivity.class);
-            startActivity(intRecord);
-            //finish();*/
-
-            loadSettingFragment();
-
+            loadSettingActivity();
         }
 
         return super.onOptionsItemSelected(item);
@@ -475,7 +427,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.e("KLE_restore: ", HTTP_URL);
+        Log.e("onRestoreInstance:", HTTP_URL);
 
         try {
             //we use onRestoreInstanceState in order to play the video playback from the stored position
@@ -504,9 +456,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG, "------------------------- onStart");
+        //loadSettingData();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG, "------------------------- onResume");
+        // To use the preferences when the activity starts and when the user navigates back from the settings activity.
+        loadSettingData();
         LoadRTSP();
+
+
     }
 
     @Override
@@ -514,4 +478,12 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
     }
 
+
+/*    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.i(TAG, "------------------------- onSharedPreferenceChanged");
+        //finish();
+        //startActivity(getIntent());
+        loadSettingData();
+    }*/
 }

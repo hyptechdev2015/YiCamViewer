@@ -1,16 +1,20 @@
 package com.thexma.yicamviewer;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 
-public class SettingsFragment extends PreferenceFragment  {
+public class SettingsFragment extends PreferenceFragment   {
+    final String TAG = "--- SettingsFragment";
+
 
 
     public SettingsFragment() {
@@ -18,7 +22,7 @@ public class SettingsFragment extends PreferenceFragment  {
     }
 
 
-/*    @Override
+    /*    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         TextView textView = new TextView(getActivity());
@@ -29,7 +33,7 @@ public class SettingsFragment extends PreferenceFragment  {
     @Override
     public void onCreate(Bundle savedInstanceState) {
           super.onCreate(savedInstanceState);
-
+        Log.i(TAG," -----oncreate");
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.app_references);
@@ -43,5 +47,6 @@ public class SettingsFragment extends PreferenceFragment  {
 
         return view;
     }
+
 
 }
