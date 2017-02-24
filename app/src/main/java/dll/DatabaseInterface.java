@@ -35,7 +35,7 @@ public class DatabaseInterface {
 
     public ArrayList<Record> getRecordList() {
         ArrayList<Record> res = new ArrayList<Record>();
-        Cursor cursor = database.query("records", null, null, null, null, null, "id");
+        Cursor cursor = database.query(RecordDB.TABLE_RECORDS, null, null, null, null, null, "id");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Record t = cursorToRecord(cursor);
@@ -50,9 +50,9 @@ public class DatabaseInterface {
         ArrayList<Record> res = new ArrayList<Record>();
         Cursor cursor;
         if (date == -1)
-            cursor = database.query("records", null, null, null, null, null, "id");
+            cursor = database.query( RecordDB.TABLE_RECORDS, null, null, null, null, null, "id");
         else
-            cursor = database.query("records", null, "date = " + date, null, null, null, "id");
+            cursor = database.query(RecordDB.TABLE_RECORDS, null, "date = " + date, null, null, null, "id");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Record e = cursorToRecord(cursor);
@@ -62,15 +62,21 @@ public class DatabaseInterface {
         cursor.close();
         return res;
     }
+    //public Record(long id, String folderName, String fileName, String fileDate, String fileSize, String fullUrl, int date, byte[] image){
 
+    /**
+     * c.getLong(0) is for _ID
+     * @param c
+     * @return
+     */
     private Record cursorToRecord(Cursor c) {
-        Record t = new Record(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), c.getInt(6), c.getBlob(7));
+        Record t = new Record(c.getLong(1), c.getString(2), c.getString(3), c.getString(4), c.getString(5), c.getString(6), c.getInt(7), c.getBlob(8));
         return t;
     }
 
     public Record getLastestRecord() {
         Record rec = new Record();
-        String selectQuery = "SELECT * FROM records ORDER BY column DESC LIMIT 1;";
+        String selectQuery = "SELECT * FROM "+ RecordDB.TABLE_RECORDS + " ORDER BY column DESC LIMIT 1;";
         Cursor cursor = database.rawQuery(selectQuery, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {

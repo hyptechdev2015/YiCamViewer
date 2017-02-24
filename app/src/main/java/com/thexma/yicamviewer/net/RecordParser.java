@@ -91,7 +91,7 @@ public class RecordParser {
 
                                 Record rec = new Record(uniquDateID, folder, mp4FileName, databaseDateFormat.format(mp4DateTime).toString(), fileSize, fullUrl, dateIntSearch, null);
                                 recordList.add(rec);
-                                Log.i(TAG, rec.toString());
+                                //Log.i(TAG, rec.toString());
                             } catch (ParseException ex) {
                                 Log.e(TAG, ex.toString());
 //                                System.out.println("Exception " + ex);
@@ -106,6 +106,10 @@ public class RecordParser {
         }
         catch(Exception ex){
             Log.e(TAG, ex.toString());
+        }
+        finally {
+            if(recordList != null)
+                Log.i(TAG, " found:" + recordList.size() ) ;
         }
 
         return recordList;

@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.thexma.yicamviewer.MainActivity;
 import com.thexma.yicamviewer.provider.RecordContract;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -39,7 +40,7 @@ import com.thexma.yicamviewer.net.RecordParser;
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = "--- SyncAdapter";
 
-    private static final String FEED_URL = "http://192.168.29.168/record/";
+    private static String FEED_URL;
     // "http://android-developers.blogspot.com/atom.xml";
 
 
@@ -93,9 +94,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-
+        FEED_URL = MainActivity.HTTP_RECORD_URL;
         Log.i(TAG, "Beginning network synchronization");
-        Log.d(TAG, "onPerformSync for account[" + account.name + "]");
+        Log.d(TAG, "onPerformSync for account[" + account.name + "] " + FEED_URL);
+
         try {
             final URL location = new URL(FEED_URL);
             InputStream stream = null;
@@ -168,7 +170,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         // Find stale data
         int id; //autoID
 
-        int entryId;
+        long entryId;
         String recFolder;
         String recFileName;
         String recFileDate;
@@ -182,7 +184,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             id = c.getInt(COLUMN_ID);
 
-            entryId = Integer.getInteger(c.getString(RECORDS_ID));
+            entryId = c.getLong(RECORDS_ID);
             recFolder = c.getString(RECORDS_FOLDERNAME);
             recFileName = c.getString(RECORDS_FILENAME);
             recFileDate = c.getString(RECORDS_FILEDATE);
@@ -206,9 +208,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     // Update existing record
                     Log.i(TAG, "Scheduling update: " + existingUri);
                     batch.add(ContentProviderOperation.newUpdate(existingUri)
+                            .withValue(RecordContract.RecordEntry.RECORDS_FOLDERNAME, match.getFolderName() )
                             .withValue(RecordContract.RecordEntry.RECORDS_FILENAME, match.getFileName() )
                             .withValue(RecordContract.RecordEntry.RECORDS_FILEDATE, match.getFileDate() )
                             .withValue(RecordContract.RecordEntry.RECORDS_FILESIZE, match.getFileSize() )
+                            .withValue(RecordContract.RecordEntry.RECORDS_FULLURL, match.getFullUrl() )
+                            .withValue(RecordContract.RecordEntry.RECORDS_DATE, match.getDate() )
+                            .withValue(RecordContract.RecordEntry.RECORDS_THUMBNAIL, match.getThumbnail() )
                             .build());
                     syncResult.stats.numUpdates++;
                 } else {
@@ -233,7 +239,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     .withValue(RecordContract.RecordEntry.RECORDS_ID, e.getID())
                     .withValue(RecordContract.RecordEntry.RECORDS_FOLDERNAME, e.getFolderName())
                     .withValue(RecordContract.RecordEntry.RECORDS_FILENAME, e.getFileName())
-                    .withValue(RecordContract.RecordEntry.RECORDS_DATE, e.getFileDate())
+                    .withValue(RecordContract.RecordEntry.RECORDS_FILEDATE, e.getFileDate())
                     .withValue(RecordContract.RecordEntry.RECORDS_FILESIZE, e.getFileSize())
                     .withValue(RecordContract.RecordEntry.RECORDS_FULLURL, e.getFullUrl())
                     .withValue(RecordContract.RecordEntry.RECORDS_DATE, e.getDate())
